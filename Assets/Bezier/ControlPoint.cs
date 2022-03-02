@@ -41,8 +41,8 @@ public class ControlPointEditor : Editor
 			// BEZIER:
 			Handles.color = Color.yellow;
 
-			float t = 0;
-			float resolution = 0.1f;
+			decimal t = 0;
+			decimal resolution = 0.1m;
 			while (t <= 1)
 			{
 				Handles.DrawLine(bezier.GetBezierPointT(t), bezier.GetBezierPointT(t += resolution), 5.0f);
@@ -60,7 +60,7 @@ public class ControlPointEditor : Editor
 
 			// LABEL
 			GUI.color = Color.yellow;
-			Handles.Label(bezier.GetBezierPointT(0.5f) + Vector3.up * 20, "Curva de Bezier");
+			Handles.Label(bezier.GetBezierPointT(0.5m) + Vector3.up * 20, "Curva de Bezier");
 
 			_lastPosition = cp.transform.position;
 		}

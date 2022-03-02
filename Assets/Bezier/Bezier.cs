@@ -15,9 +15,9 @@ public class Bezier : MonoBehaviour
 	public List<Vector3> controlPoints;
 	public List<Vector3> points = new List<Vector3>();
 
-	public float BezierResolution = 0.01f;
+	public decimal BezierResolution = 0.01m;
 
-	private float length = 0;
+	private decimal length = 0;
 
 	// Start is called before the first frame update
 	void Start()
@@ -48,7 +48,7 @@ public class Bezier : MonoBehaviour
 	}
 
 
-	public Vector3 GetBezierPointT(float t)
+	public Vector3 GetBezierPointT(decimal t)
 	{
 		if (t <= 0)
 			return controlPoints[0];
@@ -66,35 +66,40 @@ public class Bezier : MonoBehaviour
 			float comb = Combinatoria(n, i);
 
 			// GRADO n ==> p(t) = SUM[i=0,n] ( Pi * comb(n,i) * (1-t)^(n-i) * t^i )
-			p += (controlPoints[i] * (comb * Mathf.Pow(1 - t, n - i) * Mathf.Pow(t, i)));
+			p += (controlPoints[i] * (comb * Mathf.Pow((float)(1 - t), n - i) * Mathf.Pow((float)t, i)));
 		}
 
 		return p;
 	}
 
 	// Saca el espacio que hay en un segmento de la curva con una precision (derivada) de delta
-	public float GetLengthIncrementoT(float t, float delta)
+	public decimal GetLengthIncrementoT(decimal t, decimal delta)
 	{
 		Vector3 p0 = GetBezierPointT(t);
 		Vector3 p1 = GetBezierPointT(t + delta);
 
-		return (p1 - p0).magnitude;
+		return (decimal)(p1 - p0).magnitude;
 	}
 
 	// Tabla de Espacio Acumulado para cada t de la curva
-	private Dictionary<float, float> tablaEspacioAcumulado;
-	private float intervaloT = 0.01f;
+	private Dictionary<decimal, decimal> tablaEspacioAcumulado = new Dictionary<decimal, decimal>();
 
 	// longitud acumulada en la curva para un punto t en ella
 	// RECURSIVIDAD + MEMOIZATION
-	public float GetLengthAcumuladaT(float t)
+	public decimal GetLengthAcumuladaT(decimal t, decimal intervaloT = 0.001m)
 	{
+		if (t <= 0)
+			return 0;
+
+		if (t >= 1)
+			return GetLenght();
+
 		// MEMOIZATION
 		if (tablaEspacioAcumulado.ContainsKey(t))
 			return tablaEspacioAcumulado[t];
 
 		// t Anterior:
-		float tAnterior = t - intervaloT;
+		decimal tAnterior = t - intervaloT;
 		// Acumulamos el espacio acumulado del t anterior al t actual
 		// Con RECURSIVIDAD
 		tablaEspacioAcumulado.Add(t, GetLengthAcumuladaT(tAnterior) + GetLengthIncrementoT(t, intervaloT));
@@ -103,18 +108,18 @@ public class Bezier : MonoBehaviour
 	}
 
 	// Longitud de la Curva
-	public float GetLenght(float precision = 0.001f)
+	public decimal GetLenght(decimal precision = 0.001m)
 	{
 		// Si ya esta precalculada no se calcula
 		return this.length > 0 ? this.length : UpdateLenght(precision);
 	}
 
 	// Recalcula la Longitud de la Curva
-	private float UpdateLenght(float precision = 0.001f)
+	private decimal UpdateLenght(decimal precision = 0.001m)
 	{
 		// Recorre la curva en intervalos de [precision]
 		length = 0;
-		for (float i = 0; i <= 1; i += precision)
+		for (decimal i = 0; i <= 1; i += precision)
 		{
 			// Acumula derivadas
 			length += GetLengthIncrementoT(i, precision);
@@ -122,20 +127,59 @@ public class Bezier : MonoBehaviour
 		return length; // derivadas acumuladas
 	}
 
+	private int maxIteraciones = 50;
 
 	// Devuelve el Parámetro t para un espacio recorrido en la curva
-	public float GetT(float s, float margenError = 0.00001f)
+	public decimal GetT(decimal s, int iteraciones = 0, decimal espacioAcumulado = 0, decimal t = 0, decimal intervaloT = 0.1m)
 	{
-		float espacioAcumulado = 0; // Espacio acumulado que recorre cada intervalo
-
+		// un margen de error tal que pueda subdividirse la curva en 1000 cachitos
+		decimal margenError = GetLenght() / 1000;
 		// Casos Triviales:
 		// Si s es 0 es el primer punto de la curva
-		if (s == 0) return 0;
-		// Si la s es cercana a la longitud total de la curva (con un margen de error) devolvemos el final de la curva
-		if (Math.Abs(s - GetLenght()) < margenError) 
+		if (s <= 0)
+			return 0;
+		if (s >= GetLenght())
 			return 1;
 
-		float t; // t mas cercana a la posicion que se busca
+		// Si la s es cercana a la longitud total de la curva (con un margen de error) devolvemos el final de la curva
+		if (Math.Abs(s - GetLenght()) < margenError)
+			return 1;
+
+		// Si se ha acercado a s lo suficiente obtenemos ese t
+		if (Math.Abs(espacioAcumulado - s) < margenError)
+		{
+			//print("Termina en " + iteraciones + " iteraciones" + "\nt: " + t + "\n"
+			//      + "Recorrido: " + espacioAcumulado + "\n" + "Objetivo: " + s
+			//      + "\nIntervaloT: " + intervaloT);
+			return t;
+		}
+		
+		//print("Intervalo: " + intervaloT + "\nT: " + t
+		//	+ "\nRecorrido: " + espacioAcumulado + "\nObjetivo: " + s);
+
+		// Si es negativa la diferencia
+		// Cogemos un intervalo mas pequeño entre el t anterior y este t
+		// Ej: 0.2 sale negativo, volver a 0.1, intervalo / 10 = 0.01, seguimos 0.11, 0.12, 0.13...
+		if (s - espacioAcumulado < 0)
+		{
+			t -= intervaloT;
+			intervaloT /= 10;
+		}
+
+		t += intervaloT; // Aumentamos al siguiente intervalo
+		
+		iteraciones++;
+		if (iteraciones >= maxIteraciones)
+		{
+			print("!!!! Termina en " + iteraciones + " iteraciones !!!!!\n" + "t: " + t + "\n" 
+			      + "Recorrido: " + espacioAcumulado + "\n" + "Objetivo: " + s
+			      + "\nIntervaloT: " + intervaloT);
+			return t;
+		}
+
+		return GetT(s, iteraciones, GetLengthAcumuladaT(t, 0.001m), t, intervaloT);
+
+		/*
 		for (t = 0; t < 1; t += intervaloT)
 		{
 			// Espacio de cada intervalo chikito
@@ -176,6 +220,7 @@ public class Bezier : MonoBehaviour
 			iteraciones++;
 		}
 		return t;
+		*/
 	}
 
 	// Actualiza los puntos de control cuando se muevan ingame
@@ -207,7 +252,7 @@ public class Bezier : MonoBehaviour
 		points.Add(inicio);
 
 		// El parametro de la linea t va incrementado segun la resolucion de la curva
-		float t = BezierResolution;
+		decimal t = BezierResolution;
 		
 		while (t <= 1)
 		{
