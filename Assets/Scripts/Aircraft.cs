@@ -7,34 +7,62 @@ public class Aircraft : MonoBehaviour
 	public Bezier bezier;
 
 	public float speed;
-	private float espacioRecorrido = 0;
 
 	// Start is called before the first frame update
 	void Start()
 	{
 		transform.position = bezier.GetBezierPointT(0);
 	}
-
+	/*
 	// Update is called once per frame
 	void FixedUpdate()
 	{
 		// Reset a la posicion inicial si se ha completado el recorrido
-		if (espacioRecorrido > bezier.GetLenght())
+		if (espacioAcumulado > bezier.GetLenght())
 		{
-			transform.position = bezier.GetBezierPointT(0);
-			espacioRecorrido = 0;
+			Reset();
 		}
 		
 		float deltaTime = Time.fixedDeltaTime; // Tiempo de frame
-		float espacio = speed * deltaTime; // Espacio que tiene que recorrer
-		espacioRecorrido += espacio;
+		MoveInBezier(speed, deltaTime);
+	}
+	*/
 
-		// Espacio normalizado a t
-		float t = bezier.GetT(espacioRecorrido);
-		
+	void Update()
+	{
+		// Reset a la posicion inicial si se ha completado el recorrido
+		if (_espacioAcumulado > bezier.GetLenght())
+		{
+			Reset();
+		}
+
+		float deltaTime = Time.deltaTime; // Tiempo de frame
+		MoveInBezier(speed, deltaTime);
+	}
+
+	// Espacio recorrido en la Curva Bezier
+	private float _espacioAcumulado = 0;
+
+	private void Reset()
+	{
+		transform.position = bezier.GetBezierPointT(0);
+		_espacioAcumulado = 0;
+	}
+
+	// Ecuacion del espacio = velocidad * tiempo
+	private float MoveInBezier(float velocidad, float tiempo)
+	{
+		float espacio = velocidad * tiempo; // Espacio que tiene que recorrer
+		_espacioAcumulado += espacio;
+
+		// Espacio normalizado a t (parametro t en la curva con esa longitud con el punto inicial en un margen de error)
+		float t = bezier.GetT(_espacioAcumulado, 0.00001f);
+
+		// Mueve el objecto a la posicion de t en la curva
 		transform.position = bezier.GetBezierPointT(t);
 
-		print("t = " + ((t - bezier.GetT(espacioRecorrido - espacio))) + "; espacio = " + espacio);
-		//print(bezier.GetLenght());
+		//print("Intervalo t = " + ((t - bezier.GetT(_espacioAcumulado - espacio))) + "; Espacio recorrido = " + espacio);
+
+		return t;
 	}
 }

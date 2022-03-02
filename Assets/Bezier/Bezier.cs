@@ -81,6 +81,27 @@ public class Bezier : MonoBehaviour
 		return (p1 - p0).magnitude;
 	}
 
+	// Tabla de Espacio Acumulado para cada t de la curva
+	private Dictionary<float, float> tablaEspacioAcumulado;
+	private float intervaloT = 0.01f;
+
+	// longitud acumulada en la curva para un punto t en ella
+	// RECURSIVIDAD + MEMOIZATION
+	public float GetLengthAcumuladaT(float t)
+	{
+		// MEMOIZATION
+		if (tablaEspacioAcumulado.ContainsKey(t))
+			return tablaEspacioAcumulado[t];
+
+		// t Anterior:
+		float tAnterior = t - intervaloT;
+		// Acumulamos el espacio acumulado del t anterior al t actual
+		// Con RECURSIVIDAD
+		tablaEspacioAcumulado.Add(t, GetLengthAcumuladaT(tAnterior) + GetLengthIncrementoT(t, intervaloT));
+
+		return tablaEspacioAcumulado[t];
+	}
+
 	// Longitud de la Curva
 	public float GetLenght(float precision = 0.001f)
 	{
@@ -101,54 +122,60 @@ public class Bezier : MonoBehaviour
 		return length; // derivadas acumuladas
 	}
 
+
 	// Devuelve el Parámetro t para un espacio recorrido en la curva
-	public float GetT(float s)
+	public float GetT(float s, float margenError = 0.00001f)
 	{
-		float precision = 0.00001f; // Margen de error en distancia
-		float intervaloT = 0.01f; // Intervalos de la curva donde comprobar
 		float espacioAcumulado = 0; // Espacio acumulado que recorre cada intervalo
 
-		for (float t = 0; t < 1; t += intervaloT)
+		// Casos Triviales:
+		// Si s es 0 es el primer punto de la curva
+		if (s == 0) return 0;
+		// Si la s es cercana a la longitud total de la curva (con un margen de error) devolvemos el final de la curva
+		if (Math.Abs(s - GetLenght()) < margenError) 
+			return 1;
+
+		float t; // t mas cercana a la posicion que se busca
+		for (t = 0; t < 1; t += intervaloT)
 		{
 			// Espacio de cada intervalo chikito
 			espacioAcumulado += GetLengthIncrementoT(t, intervaloT);
 
-			// Cuando se supera, se comprueba si la imprecision es mayor
-			if (espacioAcumulado > s)
-			{
-				// Si esta en el margen de error, es ese el punto
-				if (Math.Abs(espacioAcumulado - s) < precision)
-				{
-					return t;
-				}
-
-				// Por si acaso dejamos un maximo de intentos a que acote
-				int maxIteraciones = 20;
-				int iteraciones = 0;
-
-				// Sino, acotamos arriba y abajo hasta que 
-				while (Math.Abs(espacioAcumulado - s) < precision && iteraciones < maxIteraciones)
-				{
-					// Acoto el intervalo en menor medida
-					intervaloT /= 2;
-					if (espacioAcumulado - s > precision) // Disminuyo en un menor intervalo
-					{
-						t -= precision;
-						espacioAcumulado -= GetLengthIncrementoT(t, intervaloT);
-					}
-					else // Aumento en un menor intervalo
-					{
-						t += precision;
-						espacioAcumulado += GetLengthIncrementoT(t, intervaloT);
-					}
-
-					iteraciones++;
-				}
-				return t;
-			}
+			// Continua aumentando hasta que supere el espacio que necesita
+			if (espacioAcumulado >= s)
+				break;
 		}
 
-		return 0;
+		// Caso trivial: s esta al final de la curva
+		if (t >= 1) return t;
+
+		// Si esta en el margen de error, es ese el punto
+		if (Math.Abs(espacioAcumulado - s) < margenError)
+			return t;
+
+		// Por si acaso dejamos un maximo de intentos a que acote
+		int maxIteraciones = 20;
+		int iteraciones = 0;
+
+		// Acotamos arriba y abajo hasta que no se supere el margen de error
+		while (Math.Abs(espacioAcumulado - s) > margenError && iteraciones < maxIteraciones)
+		{
+			// Acoto el intervalo a la mitad
+			intervaloT /= 2;
+			if (espacioAcumulado - s > margenError) // Disminuyo la mitad si es positivo
+			{
+				t -= intervaloT;
+				espacioAcumulado -= GetLengthIncrementoT(t, intervaloT);
+			}
+			else // Aumento la mitad
+			{
+				t += intervaloT;
+				espacioAcumulado += GetLengthIncrementoT(t - intervaloT, intervaloT);
+			}
+
+			iteraciones++;
+		}
+		return t;
 	}
 
 	// Actualiza los puntos de control cuando se muevan ingame
