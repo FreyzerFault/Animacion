@@ -17,7 +17,7 @@ public class Bezier : MonoBehaviour
 
 	public decimal BezierResolution = 0.01m;
 
-	private decimal length = 0;
+	private float length = 0;
 
 	// Start is called before the first frame update
 	void Start()
@@ -92,7 +92,7 @@ public class Bezier : MonoBehaviour
 			return 0;
 
 		if (t >= 1)
-			return GetLenght();
+			return (decimal)GetLenght();
 
 		// MEMOIZATION
 		if (tablaEspacioAcumulado.ContainsKey(t))
@@ -108,23 +108,23 @@ public class Bezier : MonoBehaviour
 	}
 
 	// Longitud de la Curva
-	public decimal GetLenght(decimal precision = 0.001m)
+	public float GetLenght(decimal precision = 0.001m)
 	{
 		// Si ya esta precalculada no se calcula
 		return this.length > 0 ? this.length : UpdateLenght(precision);
 	}
 
 	// Recalcula la Longitud de la Curva
-	private decimal UpdateLenght(decimal precision = 0.001m)
+	private float UpdateLenght(decimal precision = 0.001m)
 	{
 		// Recorre la curva en intervalos de [precision]
-		length = 0;
+		decimal s = 0;
 		for (decimal i = 0; i <= 1; i += precision)
 		{
 			// Acumula derivadas
-			length += GetLengthIncrementoT(i, precision);
+			s += GetLengthIncrementoT(i, precision);
 		}
-		return length; // derivadas acumuladas
+		return (float)s; // derivadas acumuladas
 	}
 
 	private int maxIteraciones = 50;
@@ -133,16 +133,16 @@ public class Bezier : MonoBehaviour
 	public decimal GetT(decimal s, int iteraciones = 0, decimal espacioAcumulado = 0, decimal t = 0, decimal intervaloT = 0.1m)
 	{
 		// un margen de error tal que pueda subdividirse la curva en 1000 cachitos
-		decimal margenError = GetLenght() / 1000;
+		decimal margenError = (decimal)GetLenght() / 1000;
 		// Casos Triviales:
 		// Si s es 0 es el primer punto de la curva
 		if (s <= 0)
 			return 0;
-		if (s >= GetLenght())
+		if (s >= (decimal)GetLenght())
 			return 1;
 
 		// Si la s es cercana a la longitud total de la curva (con un margen de error) devolvemos el final de la curva
-		if (Math.Abs(s - GetLenght()) < margenError)
+		if (Math.Abs(s - (decimal)GetLenght()) < margenError)
 			return 1;
 
 		// Si se ha acercado a s lo suficiente obtenemos ese t

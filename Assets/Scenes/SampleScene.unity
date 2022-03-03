@@ -726,11 +726,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Bezier: {fileID: 2082739047}
   InBezier: 1
+  InitialSpeed: 0
+  InitialAcceleration: 0
   easeInOutActivated: 1
-  InitSpeed: 10
-  Acceleration: 5
   easeInAcceleration: 5
-  easeOutDecceleration: 5
+  easeOutDeceleration: 5
   easeIn: 0.4
   easeOut: 0.4
 --- !u!1 &1784371374
