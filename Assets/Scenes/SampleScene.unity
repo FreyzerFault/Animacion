@@ -190,6 +190,58 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 19800000, guid: 147d826ca4c5a834a9dfe5db390c47f4, type: 3}
+      propertyPath: InitialModule.startSizeY.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 19800000, guid: 147d826ca4c5a834a9dfe5db390c47f4, type: 3}
+      propertyPath: InitialModule.startSizeZ.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 19800004, guid: 147d826ca4c5a834a9dfe5db390c47f4, type: 3}
+      propertyPath: InitialModule.startSizeY.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 19800004, guid: 147d826ca4c5a834a9dfe5db390c47f4, type: 3}
+      propertyPath: InitialModule.startSizeZ.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 19800006, guid: 147d826ca4c5a834a9dfe5db390c47f4, type: 3}
+      propertyPath: InitialModule.startSizeY.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 19800006, guid: 147d826ca4c5a834a9dfe5db390c47f4, type: 3}
+      propertyPath: InitialModule.startSizeZ.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 19800008, guid: 147d826ca4c5a834a9dfe5db390c47f4, type: 3}
+      propertyPath: InitialModule.startSizeY.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 19800008, guid: 147d826ca4c5a834a9dfe5db390c47f4, type: 3}
+      propertyPath: InitialModule.startSizeZ.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 19900000, guid: 147d826ca4c5a834a9dfe5db390c47f4, type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 19900002, guid: 147d826ca4c5a834a9dfe5db390c47f4, type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 19900004, guid: 147d826ca4c5a834a9dfe5db390c47f4, type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 19900006, guid: 147d826ca4c5a834a9dfe5db390c47f4, type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 19900008, guid: 147d826ca4c5a834a9dfe5db390c47f4, type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 147d826ca4c5a834a9dfe5db390c47f4, type: 3}
 --- !u!1001 &616425432
@@ -672,8 +724,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59439107468e8e14d9147b6bc2ef3bc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bezier: {fileID: 2082739047}
-  speed: 50
+  Bezier: {fileID: 2082739047}
+  InBezier: 1
+  easeInOutActivated: 1
+  InitSpeed: 10
+  Acceleration: 5
+  easeInAcceleration: 5
+  easeOutDecceleration: 5
+  easeIn: 0.4
+  easeOut: 0.4
 --- !u!1 &1784371374
 GameObject:
   m_ObjectHideFlags: 0
@@ -957,7 +1016,6 @@ MonoBehaviour:
   - {x: 0, y: 174.41626, z: 272.03226}
   - {x: 0, y: 188.3997, z: 267.00012}
   - {x: 0, y: 188.4, z: 267}
-  BezierResolution: 0.02
 --- !u!4 &2082739048
 Transform:
   m_ObjectHideFlags: 0

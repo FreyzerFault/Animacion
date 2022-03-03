@@ -82,7 +82,7 @@ public class Bezier : MonoBehaviour
 	}
 
 	// Tabla de Espacio Acumulado para cada t de la curva
-	private Dictionary<decimal, decimal> tablaEspacioAcumulado = new Dictionary<decimal, decimal>();
+	private readonly Dictionary<decimal, decimal> tablaEspacioAcumulado = new Dictionary<decimal, decimal>();
 
 	// longitud acumulada en la curva para un punto t en ella
 	// RECURSIVIDAD + MEMOIZATION
@@ -243,12 +243,7 @@ public class Bezier : MonoBehaviour
 
 		Vector3 inicio = controlPoints[0];
 		Vector3 final = controlPoints[controlPoints.Count - 1];
-
-		// Grado n
-		int n = controlPoints.Count - 1;
-
-		// Aumentamos un incremento de t a partir del primer punto
-		Vector3 puntoIncrementado = inicio;
+		
 		points.Add(inicio);
 
 		// El parametro de la linea t va incrementado segun la resolucion de la curva
