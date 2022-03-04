@@ -7,11 +7,12 @@ using UnityEngine;
 public class Bezier : MonoBehaviour
 {
 	public LineRenderer lineRenderer;
+	public bool renderLine = true;
 
-	public GameObject ControlPoint0;
-	public GameObject ControlPoint1;
-	public GameObject ControlPoint2;
-	public GameObject ControlPoint3;
+	public ControlPoint ControlPoint0;
+	public ControlPoint ControlPoint1;
+	public ControlPoint ControlPoint2;
+	public ControlPoint ControlPoint3;
 
 	public List<Vector3> controlPoints;
 	public List<Vector3> points = new List<Vector3>();
@@ -24,28 +25,17 @@ public class Bezier : MonoBehaviour
 	void Start()
 	{
 		lineRenderer = GetComponent<LineRenderer>();
-		lineRenderer.alignment = LineAlignment.View;
-		lineRenderer.startColor = Color.yellow;
-		lineRenderer.endColor = Color.yellow;
-		lineRenderer.loop = false;
-		lineRenderer.numCapVertices = 10;
-		lineRenderer.numCornerVertices = 0;
-		lineRenderer.useWorldSpace = true;
-
-		// Crea los Puntos de Control
+		
+		// Actualiza la curva, comprobando los puntos de control, los puntos y asignandoselos a el LineRenderer
 		UpdateControlPoints();
 
-		// Crea los puntos por los que pasa la Curva de Bezier
-		UpdateBezierPoints();
-
-		// Draw LineRenderer
-		lineRenderer.positionCount = points.Count;
-		lineRenderer.SetPositions(points.ToArray());
+		UpdateLineRenderer();
 	}
 
 	// Update is called once per frame
 	void Update()
 	{
+		lineRenderer.enabled = renderLine;
 	}
 
 	// Almacen/Tabla con los puntos de la curva (Vec3) segun la t porque se llama a esta funcion MUCHO
@@ -93,7 +83,7 @@ public class Bezier : MonoBehaviour
 
 	// longitud acumulada en la curva para un punto t en ella
 	// RECURSIVIDAD + MEMOIZATION
-	public decimal GetLengthAcumuladaT(decimal t, decimal intervaloT = 0.001m)
+	private decimal GetLengthAcumuladaT(decimal t, decimal intervaloT = 0.001m)
 	{
 		if (t <= 0)
 			return 0;
@@ -230,6 +220,13 @@ public class Bezier : MonoBehaviour
 		*/
 	}
 
+	public void UpdateLineRenderer()
+	{
+		// Draw LineRenderer
+		lineRenderer.positionCount = points.Count;
+		lineRenderer.SetPositions(points.ToArray());
+	}
+
 	// Actualiza los puntos de control cuando se muevan ingame
 	public void UpdateControlPoints()
 	{
@@ -246,11 +243,14 @@ public class Bezier : MonoBehaviour
 
 	public void UpdateBezierPoints()
 	{
+		// Vaciamos los puntos
+		tablaPuntosT.Clear();
+		tablaEspacioAcumulado.Clear();
 		points.Clear();
 
 		Vector3 inicio = controlPoints[0];
 		Vector3 final = controlPoints[controlPoints.Count - 1];
-		
+
 		points.Add(inicio);
 
 		// El parametro de la linea t va incrementado segun la resolucion de la curva

@@ -7,26 +7,14 @@ using UnityEngine.UIElements;
 using Cursor = UnityEngine.Cursor;
 
 [ExecuteAlways]
-public class ControlPoint : MonoBehaviour
+public class ControlPoint : DragObject
 {
 	public Bezier Bezier;
 
-	private Vector3 lastPosition;
-
-	void Start()
+	void OnMouseDrag()
 	{
-		lastPosition = transform.position;
-	}
-
-	void Update()
-	{
-		if (lastPosition != transform.position)
-		{
-			print(transform.hasChanged);
-			Bezier.UpdateBezierPoints();
-		}
-
-		lastPosition = transform.position;
+		Bezier.UpdateControlPoints();
+		Bezier.UpdateLineRenderer();
 	}
 }
 // Editor personalizado para Bezier

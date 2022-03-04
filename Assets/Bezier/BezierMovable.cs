@@ -30,7 +30,7 @@ public class BezierMovable : MonoBehaviour
 
 
 	// Start is called before the first frame update
-	private void Start()
+	protected void Start()
 	{
 		if (Bezier)
 			ResetToInit();
@@ -51,14 +51,14 @@ public class BezierMovable : MonoBehaviour
 	// Update each frame
 	protected void Update()
 	{
+		timeInSection += Time.deltaTime;
+
 		// Reset a la posicion inicial si se ha completado el recorrido
 		if (_espacioAcumulado >= Bezier.GetLenght())
 			ResetToInit();
 
 		if (InBezier)
 		{
-			timeInSection += Time.deltaTime;
-
 			if (easeInOutActivated)
 			{
 				float fraccionRecorrida = _espacioAcumulado / Bezier.GetLenght();
@@ -182,12 +182,6 @@ public class BezierMovable : MonoBehaviour
 		// Direccion de Inicio-Final normalizada
 		Vector3 direction = (finalPoint - initPoint).normalized;
 		var up = direction == Vector3.up ? Vector3.back : Vector3.up;
-
-		print("Init: " + initPoint.ToString("F8"));
-		print("Final: " + finalPoint.ToString("F8"));
-		print("Direction: " + direction.ToString("F8"));
-		print("t0: " + tAnterior.ToString("F8"));
-		print("t1: " + t.ToString("F8"));
 
 		// No es Smooth
 		//GetComponent<Rigidbody>().MoveRotation(Quaternion.LookRotation(direction));
