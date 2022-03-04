@@ -2,22 +2,31 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
+using Cursor = UnityEngine.Cursor;
 
-
+[ExecuteAlways]
 public class ControlPoint : MonoBehaviour
 {
-	public Bezier bezier;
+	public Bezier Bezier;
 
-	// Start is called before the first frame update
+	private Vector3 lastPosition;
+
 	void Start()
 	{
+		lastPosition = transform.position;
 	}
 
-	// Update is called once per frame
 	void Update()
 	{
-	
+		if (lastPosition != transform.position)
+		{
+			print(transform.hasChanged);
+			Bezier.UpdateBezierPoints();
+		}
+
+		lastPosition = transform.position;
 	}
 }
 // Editor personalizado para Bezier
@@ -33,7 +42,7 @@ public class ControlPointEditor : Editor
 		ControlPoint cp = target as ControlPoint;
 		if (cp != null)
 		{
-			Bezier bezier = cp.bezier;
+			Bezier bezier = cp.Bezier;
 
 			if (_lastPosition != cp.transform.position)
 				bezier.UpdateControlPoints();
@@ -42,7 +51,7 @@ public class ControlPointEditor : Editor
 			Handles.color = Color.yellow;
 
 			decimal t = 0;
-			decimal resolution = 0.1m;
+			decimal resolution = 0.05m;
 			while (t <= 1)
 			{
 				Handles.DrawLine(bezier.GetBezierPointT(t), bezier.GetBezierPointT(t += resolution), 5.0f);

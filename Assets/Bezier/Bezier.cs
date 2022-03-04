@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
+[ExecuteAlways]
 public class Bezier : MonoBehaviour
 {
 	public LineRenderer lineRenderer;
@@ -47,6 +48,8 @@ public class Bezier : MonoBehaviour
 	{
 	}
 
+	// Almacen/Tabla con los puntos de la curva (Vec3) segun la t porque se llama a esta funcion MUCHO
+	private readonly Dictionary<decimal, Vector3> tablaPuntosT = new Dictionary<decimal, Vector3>();
 
 	public Vector3 GetBezierPointT(decimal t)
 	{
@@ -54,6 +57,9 @@ public class Bezier : MonoBehaviour
 			return controlPoints[0];
 		if (t >= 1)
 			return controlPoints[controlPoints.Count - 1];
+
+		if (tablaPuntosT.ContainsKey(t))
+			return tablaPuntosT[t];
 
 		// Grado de la curva de Bezier
 		int n = controlPoints.Count - 1;
@@ -69,6 +75,7 @@ public class Bezier : MonoBehaviour
 			p += (controlPoints[i] * (comb * Mathf.Pow((float)(1 - t), n - i) * Mathf.Pow((float)t, i)));
 		}
 
+		tablaPuntosT[t] = p;
 		return p;
 	}
 
@@ -124,7 +131,7 @@ public class Bezier : MonoBehaviour
 			// Acumula derivadas
 			s += GetLengthIncrementoT(i, precision);
 		}
-		return (float)s; // derivadas acumuladas
+		return length = (float)s; // derivadas acumuladas
 	}
 
 	private int maxIteraciones = 50;

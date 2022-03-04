@@ -1,12 +1,18 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
+using System.Numerics;
+using TMPro;
 using UnityEngine;
+using Quaternion = UnityEngine.Quaternion;
+using Vector2 = UnityEngine.Vector2;
+using Vector3 = UnityEngine.Vector3;
 
 public class BezierMovable : MonoBehaviour
 {
 	public Bezier Bezier;
 	public bool InBezier = true;
+	public bool RotationActivated = false;
+
+	public float rotationSpeed = 5;
 
 	public float InitialSpeed = 0;
 	public float InitialAcceleration = 0;
@@ -17,7 +23,7 @@ public class BezierMovable : MonoBehaviour
 	public float easeInAcceleration = 0;
 	public float easeOutDeceleration = 0;
 	// Fraccion de la curva con Ease in Ease out [0,1]
-	public float EaseInSection = 0; 
+	public float EaseInSection = 0;
 	public float EaseOutSection = 0;
 
 	private float _espacioAcumulado = 0;
@@ -42,16 +48,11 @@ public class BezierMovable : MonoBehaviour
 	private float lastSectionSpeed = 0;
 	private bool onEase = true;
 
-	// FixedUpdate is called 50 times per second
+	// Update each frame
 	protected void Update()
 	{
-		anotherUpdate();
-	}
-
-	private void anotherUpdate()
-	{
 		// Reset a la posicion inicial si se ha completado el recorrido
-		if (_espacioAcumulado > Bezier.GetLenght())
+		if (_espacioAcumulado >= Bezier.GetLenght())
 			ResetToInit();
 
 		if (InBezier)
@@ -98,14 +99,20 @@ public class BezierMovable : MonoBehaviour
 			}
 			else // Sin Ease In Ease Out
 			{
-				MoveConstantSpeed(Time.deltaTime, InitialSpeed, InitialAcceleration);
+				_espacioAcumulado = MoveConstantSpeed(timeInSection, InitialSpeed, InitialAcceleration);
 			}
 		}
 	}
 
 	private void ResetToInit()
 	{
+		// Devolver al inicio con su transformacion y rotacion iniciales
 		transform.position = Bezier.GetBezierPointT(0);
+
+		if (RotationActivated)
+			transform.rotation = GetInitialRotation();
+
+		// Variables dependientes de la posicion de la curva reseteadas
 		_espacioAcumulado = 0;
 		timeInSection = 0;
 		lastSectionSpace = 0;
@@ -125,6 +132,10 @@ public class BezierMovable : MonoBehaviour
 
 		// Mueve el objecto a la posicion de t en la curva
 		transform.position = Bezier.GetBezierPointT(t);
+
+		// Rotates it
+		if (RotationActivated)
+			RotateTowardsCurve(t, rotationSpeed);
 
 		//print("Intervalo t = " + ((t - bezier.GetT(_espacioAcumulado - espacio))) + "; Espacio recorrido = " + espacio);
 
@@ -146,8 +157,69 @@ public class BezierMovable : MonoBehaviour
 		return MoveInBezier(time, initialSpeed, initialSpace, -deceleration);
 	}
 
-	void RotateTowardsCurve()
+	private Quaternion RotateTowardsCurve(decimal t, float rotateSpeed = 1, decimal precision = 0.01m)
 	{
+		decimal tAnterior;
 
+		// Primera Direccion: Cogemos el primer segmento
+		if (t <= 0)
+		{
+			return transform.rotation = GetInitialRotation();
+		}
+		// Ultima direccion: El ultimo segmento
+		if (t >= 1)
+		{
+			tAnterior = 1 - precision;
+			t = 1;
+		}
+		else
+			tAnterior = t - precision;
+
+		// Puntos referencia:
+		Vector3 initPoint = Bezier.GetBezierPointT(tAnterior);
+		Vector3 finalPoint = Bezier.GetBezierPointT(t);
+
+		// Direccion de Inicio-Final normalizada
+		Vector3 direction = (finalPoint - initPoint).normalized;
+		var up = direction == Vector3.up ? Vector3.back : Vector3.up;
+
+		print("Init: " + initPoint.ToString("F8"));
+		print("Final: " + finalPoint.ToString("F8"));
+		print("Direction: " + direction.ToString("F8"));
+		print("t0: " + tAnterior.ToString("F8"));
+		print("t1: " + t.ToString("F8"));
+
+		// No es Smooth
+		//GetComponent<Rigidbody>().MoveRotation(Quaternion.LookRotation(direction));
+
+		// Slerp() = Smooth
+		GetComponent<Rigidbody>().MoveRotation(
+			Quaternion.Slerp(
+				transform.rotation,
+				Quaternion.LookRotation(direction, up),
+				(Time.inFixedTimeStep ? Time.fixedDeltaTime : Time.deltaTime) * rotateSpeed
+				)
+			);
+		return transform.rotation /*= Quaternion.Slerp(
+			transform.rotation,
+			Quaternion.LookRotation(direction),
+			(Time.inFixedTimeStep ? Time.fixedDeltaTime : Time.deltaTime) * rotateSpeed
+		)*/;
+	}
+
+	private Quaternion GetInitialRotation()
+	{
+		// Puntos referencia:
+		var initPoint = Bezier.GetBezierPointT(0);
+		var finalPoint = Bezier.GetBezierPointT(0.01m);
+
+		// Direccion de Inicio-Final normalizada
+		Vector3 direction = (finalPoint - initPoint).normalized;
+		Vector3 up = Vector3.up;
+		if (Math.Abs((direction - Vector3.up).magnitude) < 0.01f)
+			up = Vector3.back;
+
+		//transform.rotation = Quaternion.LookRotation(direction);
+		return transform.rotation = Quaternion.LookRotation(direction, up);
 	}
 }
