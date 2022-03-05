@@ -26,7 +26,7 @@ public class ControlPoint : MonoBehaviour
 		if (!bezier)
 			print("No hay Bezier asignada a " + this.ToString());
 
-		enabled = bezier.renderControlPoints;
+		 //= bezier.renderControlPoints;
 	}
 
 	void OnMouseDrag()

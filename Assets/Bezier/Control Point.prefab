@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 7429040198882533624}
   - component: {fileID: 6747856781158726917}
   - component: {fileID: 2779042977844996311}
+  - component: {fileID: 8790081140853067092}
   m_Layer: 5
   m_Name: Control Point
   m_TagString: Bezier Control Point
@@ -107,3 +108,16 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9043571824036299694}
   m_Mesh: {fileID: 4300002, guid: 103612e5e1ff43a4e896c567a2cb3ae1, type: 3}
+--- !u!65 &8790081140853067092
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9043571824036299694}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1.9999999, y: 2, z: 1.9999998}
+  m_Center: {x: -0.000000059604645, y: 0, z: 0.000000029802322}
