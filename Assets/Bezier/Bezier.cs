@@ -66,6 +66,29 @@ public class Bezier : MonoBehaviour
 		return p;
 	}
 
+	public Vector3 GetVelocity(decimal t)
+	{
+		Vector3 derivada = Vector3.zero;
+
+		derivada += cpPositions[0] * (float)(-3 *t*t +6 *t - 3);
+		derivada += cpPositions[1] * (float)( 9 *t*t -12*t + 3);
+		derivada += cpPositions[2] * (float)(-9 *t*t +6 *t    );
+		derivada += cpPositions[3] * (float)( 3 *t*t          );
+		
+		return derivada;
+	}
+	public Vector3 GetAcceleration(decimal t)
+	{
+		Vector3 derivada = Vector3.zero;
+
+		derivada += cpPositions[0] * (float)(- 6 *t + 6);
+		derivada += cpPositions[1] * (float)( 18 *t - 12);
+		derivada += cpPositions[2] * (float)(-18 *t + 6);
+		derivada += cpPositions[3] * (float)(  6 *t    );
+		
+		return derivada;
+	}
+
 	// Saca el espacio que hay en un segmento de la curva con una precision (derivada) de delta
 	public decimal GetLengthIncrementoT(decimal t, decimal delta)
 	{

@@ -12,6 +12,8 @@ public class BezierMovable : MonoBehaviour
 	public bool InBezier = true;
 	public bool RotationActivated = false;
 
+	[SerializeField]public float animationTime = 5; // in seconds
+
 	public float rotationSpeed = 5;
 
 	public float InitialSpeed = 0;
@@ -99,7 +101,7 @@ public class BezierMovable : MonoBehaviour
 			}
 			else // Sin Ease In Ease Out
 			{
-				_espacioAcumulado = MoveConstantSpeed(timeInSection, InitialSpeed, InitialAcceleration);
+				_espacioAcumulado = MoveConstantSpeedByTime(animationTime, timeInSection);
 			}
 		}
 	}
@@ -151,54 +153,53 @@ public class BezierMovable : MonoBehaviour
 	{
 		return MoveInBezier(time, speed, initialSpace);
 	}
+	private float MoveConstantSpeedByTime(float animationTime, float time)
+	{
+		float speed = Bezier.GetLenght() / animationTime;
+
+		float espacio = (speed * time);
+
+		if (espacio > Bezier.GetLenght())
+			espacio -= Bezier.GetLenght();
+
+		// Espacio normalizado a t (parametro t en la curva con esa longitud con el punto inicial en un margen de error)
+		decimal t = Bezier.GetT((decimal)espacio);
+
+		// Mueve el objecto a la posicion de t en la curva
+		transform.position = Bezier.GetBezierPointT(t);
+
+		// Rotates it
+		if (RotationActivated)
+			RotateTowardsCurve(t, rotationSpeed);
+
+		return espacio;
+	}
 
 	private float MoveEaseOut(float time, float deceleration, float initialSpeed, float initialSpace = 0)
 	{
 		return MoveInBezier(time, initialSpeed, initialSpace, -deceleration);
 	}
 
-	private Quaternion RotateTowardsCurve(decimal t, float rotateSpeed = 1, decimal precision = 0.01m)
+	private Quaternion RotateTowardsCurve(decimal t, float rotateSpeed = 1)
 	{
-		decimal tAnterior;
-
 		// Primera Direccion: Cogemos el primer segmento
 		if (t <= 0)
 		{
 			return transform.rotation = GetInitialRotation();
 		}
-		// Ultima direccion: El ultimo segmento
-		if (t >= 1)
-		{
-			tAnterior = 1 - precision;
-			t = 1;
-		}
-		else
-			tAnterior = t - precision;
 
-		// Puntos referencia:
-		Vector3 initPoint = Bezier.GetBezierPointT(tAnterior);
-		Vector3 finalPoint = Bezier.GetBezierPointT(t);
+		// Apunta en direccion de la Tangente de la Curva (Derivada)
+		Quaternion tangentQuat = Quaternion.LookRotation(Bezier.GetVelocity(t));
 
-		// Direccion de Inicio-Final normalizada
-		Vector3 direction = (finalPoint - initPoint).normalized;
-		var up = direction == Vector3.up ? Vector3.back : Vector3.up;
-
-		// No es Smooth
-		//GetComponent<Rigidbody>().MoveRotation(Quaternion.LookRotation(direction));
-
-		// Slerp() = Smooth
 		GetComponent<Rigidbody>().MoveRotation(
 			Quaternion.Slerp(
 				transform.rotation,
-				Quaternion.LookRotation(direction, up),
-				(Time.inFixedTimeStep ? Time.fixedDeltaTime : Time.deltaTime) * rotateSpeed
+				tangentQuat,
+				(Time.inFixedTimeStep ? Time.fixedDeltaTime : Time.deltaTime) * Bezier.GetAcceleration(t).magnitude
 				)
 			);
-		return transform.rotation /*= Quaternion.Slerp(
-			transform.rotation,
-			Quaternion.LookRotation(direction),
-			(Time.inFixedTimeStep ? Time.fixedDeltaTime : Time.deltaTime) * rotateSpeed
-		)*/;
+
+		return tangentQuat;
 	}
 
 	private Quaternion GetInitialRotation()
