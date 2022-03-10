@@ -3122,13 +3122,14 @@ MonoBehaviour:
   InBezier: 1
   RotationActivated: 0
   AnimationTime: 5
-  easeInOutActivated: 1
+  easeInOutActivated: 0
   EaseInSection: 0.4
   EaseOutSection: 0.4
   t: 0
   timeInBezier: 0
   acceleration: 0
   lastSectionSpeed: 0
+  d: 0
 --- !u!114 &1145388791 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
@@ -3161,13 +3162,14 @@ MonoBehaviour:
   InBezier: 1
   RotationActivated: 1
   AnimationTime: 10
-  easeInOutActivated: 1
-  EaseInSection: 0.4
-  EaseOutSection: 0.4
+  easeInOutActivated: 0
+  EaseInSection: 0.2
+  EaseOutSection: 0.2
   t: 0
   timeInBezier: 0
   acceleration: 0
   lastSectionSpeed: 0
+  d: 0
 --- !u!114 &1336453258
 MonoBehaviour:
   m_ObjectHideFlags: 0
