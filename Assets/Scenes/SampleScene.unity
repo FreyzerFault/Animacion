@@ -3121,15 +3121,14 @@ MonoBehaviour:
   Bezier: {fileID: 1145388791}
   InBezier: 1
   RotationActivated: 0
-  animationTime: 5
-  rotationSpeed: 5
-  InitialSpeed: 0
-  InitialAcceleration: 0
+  AnimationTime: 5
   easeInOutActivated: 1
-  easeInAcceleration: 5
-  easeOutDeceleration: 5
   EaseInSection: 0.4
   EaseOutSection: 0.4
+  t: 0
+  timeInBezier: 0
+  acceleration: 0
+  lastSectionSpeed: 0
 --- !u!114 &1145388791 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
@@ -3161,15 +3160,14 @@ MonoBehaviour:
   Bezier: {fileID: 2082739047}
   InBezier: 1
   RotationActivated: 1
-  animationTime: 20.27
-  rotationSpeed: 5
-  InitialSpeed: 0
-  InitialAcceleration: 0
-  easeInOutActivated: 0
-  easeInAcceleration: 5
-  easeOutDeceleration: 5
+  AnimationTime: 10
+  easeInOutActivated: 1
   EaseInSection: 0.4
   EaseOutSection: 0.4
+  t: 0
+  timeInBezier: 0
+  acceleration: 0
+  lastSectionSpeed: 0
 --- !u!114 &1336453258
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3324,6 +3322,10 @@ PrefabInstance:
     - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
       propertyPath: cpPositions.Array.data[3].y
       value: 122.200005
+      objectReference: {fileID: 0}
+    - target: {fileID: 2154273876214995180, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
+      propertyPath: m_Positions.Array.size
+      value: 102
       objectReference: {fileID: 0}
     - target: {fileID: 2154273876214995180, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
       propertyPath: m_Positions.Array.data[1].x

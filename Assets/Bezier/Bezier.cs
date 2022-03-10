@@ -4,6 +4,16 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
+
+public static class ExtensionMethods
+{
+	// Extension de Float para el REMAP con Interpolacion Lineal
+	// Pasa un valor de [in0, in1] a [out0, out1]
+	public static float Remap(this float value, float in0, float in1, float out0, float out1)
+	{
+		return (value - in0) / (in1 - in0) * (out1 - out0) + out0;
+	}
+}
 [ExecuteAlways]
 public class Bezier : MonoBehaviour
 {
@@ -20,9 +30,9 @@ public class Bezier : MonoBehaviour
 
 	// Look Up Table de Distancia Acumulada para cada t de la curva
 	// t => distancia
-	private readonly Dictionary<decimal, decimal> LUTdistanceByT = new Dictionary<decimal, decimal>();
+	private readonly Dictionary<decimal, float> LUTdistanceByT = new Dictionary<decimal, float>();
 	// distancia => t
-	private readonly Dictionary<decimal, decimal> LUTtByDistance = new Dictionary<decimal, decimal>();
+	private readonly Dictionary<float, decimal> LUTtByDistance = new Dictionary<float, decimal>();
 
 	// Start is called before the first frame update
 	void Awake()
@@ -50,6 +60,9 @@ public class Bezier : MonoBehaviour
 		if (t >= 1)
 			return cpPositions[cpPositions.Length - 1];
 
+		if (LUTpuntosT.ContainsKey(t))
+			return LUTpuntosT[t];
+
 		// Grado de la curva de Bezier
 		int n = cpPositions.Length - 1;
 
@@ -66,47 +79,53 @@ public class Bezier : MonoBehaviour
 		return p;
 	}
 
-	public Vector3 GetVelocity(decimal t)
+	public Vector3 GetVelocity(float t)
 	{
 		Vector3 derivada = Vector3.zero;
 
-		derivada += cpPositions[0] * (float)(-3 *t*t +6 *t - 3);
-		derivada += cpPositions[1] * (float)( 9 *t*t -12*t + 3);
-		derivada += cpPositions[2] * (float)(-9 *t*t +6 *t    );
-		derivada += cpPositions[3] * (float)( 3 *t*t          );
+		derivada += cpPositions[0] * (-3 *t*t +6 *t - 3);
+		derivada += cpPositions[1] * ( 9 *t*t -12*t + 3);
+		derivada += cpPositions[2] * (-9 *t*t +6 *t    );
+		derivada += cpPositions[3] * ( 3 *t*t          );
 		
 		return derivada;
 	}
-	public Vector3 GetAcceleration(decimal t)
+	public Vector3 GetAcceleration(float t)
 	{
 		Vector3 derivada = Vector3.zero;
 
-		derivada += cpPositions[0] * (float)(- 6 *t + 6);
-		derivada += cpPositions[1] * (float)( 18 *t - 12);
-		derivada += cpPositions[2] * (float)(-18 *t + 6);
-		derivada += cpPositions[3] * (float)(  6 *t    );
+		derivada += cpPositions[0] * (- 6 *t + 6);
+		derivada += cpPositions[1] * ( 18 *t - 12);
+		derivada += cpPositions[2] * (-18 *t + 6);
+		derivada += cpPositions[3] * (  6 *t    );
 		
 		return derivada;
 	}
 
 	// Saca el espacio que hay en un segmento de la curva con una precision (derivada) de delta
-	public decimal GetLengthIncrementoT(decimal t, decimal delta)
+	private float GetLengthIncrementoT(decimal t, decimal delta)
 	{
 		Vector3 p0 = LUTpuntosT.ContainsKey(t) ? LUTpuntosT[t] : GetBezierPointT(t);
 		Vector3 p1 = LUTpuntosT.ContainsKey(t + delta) ? LUTpuntosT[t + delta] : GetBezierPointT(t + delta);
 
-		return (decimal)(p1 - p0).magnitude;
+		return (p1 - p0).magnitude;
+	}
+
+	// Longitud de la Curva
+	public float GetLenght()
+	{
+		return LUTdistanceByT[1];
 	}
 
 
 	// Distancia acumulada en la curva para un punto t en ella
-	private decimal GetLengthAcumuladaT(decimal t)
+	public float GetDist(decimal t)
 	{
 		if (t <= 0)
 			return 0;
 
 		if (t >= 1)
-			return (decimal)GetLenght();
+			return GetLenght();
 		
 		if (LUTdistanceByT.ContainsKey(t))
 			return LUTdistanceByT[t];
@@ -116,48 +135,43 @@ public class Bezier : MonoBehaviour
 		{
 			if (t >= t0)
 			{
-				// Distancia del t encontrado + el intervalo con t calculado que falta
-				return LUTdistanceByT[t0] + GetLengthIncrementoT(t0, t - t0);
+				decimal t1 = t0 + BezierResolution;
+				// Remapeado del rango [t0,t1] a [d0,d1] por Interpolacion Lineal
+				return ((float)t).Remap((float)t0, (float)t1, LUTdistanceByT[t0], LUTdistanceByT[t1]);
 			}
 		}
 
 		// Si no interpolamos con distancias continuas a las malas
-		return t * (decimal)GetLenght();
-	}
-
-	// Longitud de la Curva
-	public float GetLenght()
-	{
-		return (float)LUTdistanceByT[1];
+		return (float)t * GetLenght();
 	}
 
 	// Devuelve el Parámetro t para un espacio recorrido en la curva
-	public decimal GetT(decimal distance)
+	public decimal GetT(float distance)
 	{
 		// Casos Triviales:
 		// Si se sale de la curva extrapolar
-		if (distance <= 0 || distance >= (decimal)GetLenght())
-			return distance / (decimal)GetLenght();
+		if (distance <= 0 || distance >= GetLenght())
+			return (decimal)(distance / GetLenght());
 
 		// Last distance
-		decimal s0 = 0;
+		float s0 = 0;
 		// Buscar por toda la tabla de distancias hasta que encaje en un hueco y interpolar la t del segmento
-		foreach (decimal s in LUTtByDistance.Keys)
+		foreach (float s1 in LUTtByDistance.Keys)
 		{
-			if (distance <= s && distance >= s0)
+			if (distance <= s1 && distance >= s0)
 			{
-				decimal t0 = LUTtByDistance[s0];
-				decimal t1 = LUTtByDistance[s];
+				float t0 = (float)LUTtByDistance[s0];
+				float t1 = (float)LUTtByDistance[s1];
 				
 				// INTERPOLACION entre los dos puntos t (% deltaS => % deltaT)
 				// t = (fraccion de distancia que sobrepasa) * (segmento t) + t0
-				return (distance - s0) / (s - s0) * (t1 - t0) + t0;
+				return (decimal)distance.Remap(s0, s1, t0, t1);
 			}
-			s0 = s;
+			s0 = s1;
 		}
 
 		// Interpolamos si no encuentra en la tabla un hueco
-		return distance / (decimal)GetLenght();
+		return (decimal)Mathf.InverseLerp(0, GetLenght(), distance);
 	}
 
 	public void UpdateLineRenderer()
@@ -204,11 +218,22 @@ public class Bezier : MonoBehaviour
 			LUTpuntosT.Add(t, point);
 
 			// distancia(t1) = ( Distancia entre p(t0) y p(t1) ) + distancia(t0)
-			decimal distancia = (decimal)(point - LUTpuntosT[tAnterior]).magnitude + LUTdistanceByT[tAnterior];
+			float distancia = (point - LUTpuntosT[tAnterior]).magnitude + LUTdistanceByT[tAnterior];
 			LUTdistanceByT.Add(t, distancia);
 			if (!LUTtByDistance.ContainsKey(distancia))
 				LUTtByDistance.Add(distancia, t);
 		}
+
+		//// Final
+		//// Punto t = 1 => Ultimo Punto de Control
+		//LUTpuntosT.Add(1, cpPositions[cpPositions.Length - 1]);
+		//// Distancia Acumulada t = 1 => (Ultimo Punto de Control - Punto de t = 1 - 0.00... (mas cercano a 1)) + Ditancia Acumulada en t = 1 - 0.00...
+		//float totalDistance = (
+		//	LUTpuntosT[1] - GetBezierPointT((float)(t - BezierResolution))).magnitude 
+		//                      + GetDist((float)(t - BezierResolution));
+		//LUTdistanceByT.Add(1, totalDistance);
+
+		//LUTtByDistance.Add(totalDistance, 1);
 	}
 
 	// COMBINATORIA (usa memoization)
@@ -254,8 +279,7 @@ public class Bezier : MonoBehaviour
 		if (LUTpuntosT.Count != 0)
 			while (t < 1)
 			{
-				if (LUTpuntosT.ContainsKey(t) && LUTpuntosT.ContainsKey(t + resolution))
-					Gizmos.DrawLine(LUTpuntosT[t], LUTpuntosT[t += resolution]);
+				Gizmos.DrawLine(GetBezierPointT(t), GetBezierPointT(t += resolution));
 			}
 
 		// Ray Control Points

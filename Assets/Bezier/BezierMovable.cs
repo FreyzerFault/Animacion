@@ -12,23 +12,22 @@ public class BezierMovable : MonoBehaviour
 	public bool InBezier = true;
 	public bool RotationActivated = false;
 
-	[SerializeField]public float animationTime = 5; // in seconds
-
-	public float rotationSpeed = 5;
-
-	public float InitialSpeed = 0;
-	public float InitialAcceleration = 0;
+	public float AnimationTime = 5; // in seconds
 
 	// EASE IN + EASE OUT
 	public bool easeInOutActivated = false;
 
-	public float easeInAcceleration = 0;
-	public float easeOutDeceleration = 0;
 	// Fraccion de la curva con Ease in Ease out [0,1]
 	public float EaseInSection = 0;
 	public float EaseOutSection = 0;
 
-	private float _espacioAcumulado = 0;
+	private bool onEase = true;
+
+	[SerializeField] private float t;
+	
+	[SerializeField] private float timeInBezier = 0;
+	[SerializeField] private float acceleration;
+	[SerializeField] private float lastSectionSpeed = 0;
 
 
 	// Start is called before the first frame update
@@ -45,63 +44,57 @@ public class BezierMovable : MonoBehaviour
 		}
 	}
 
-	private float timeInSection = 0;
-	private float lastSectionSpace = 0; // Espacio recorrido localmente a un trazo de la curva
-	private float lastSectionSpeed = 0;
-	private bool onEase = true;
-
 	// Update each frame
 	protected void Update()
 	{
-		timeInSection += Time.deltaTime;
+		float deltaTime = Time.inFixedTimeStep ? Time.fixedDeltaTime : Time.deltaTime;
+
+		// Tiempo que lleva en una de las secciones de la curva para hacer ease In / Out
+		timeInBezier += deltaTime;
 
 		// Reset a la posicion inicial si se ha completado el recorrido
-		if (_espacioAcumulado >= Bezier.GetLenght())
+		if (timeInBezier >= AnimationTime)
 			ResetToInit();
 
 		if (InBezier)
 		{
 			if (easeInOutActivated)
 			{
-				float fraccionRecorrida = _espacioAcumulado / Bezier.GetLenght();
-				if (fraccionRecorrida < EaseInSection)
+
+				if (t < EaseInSection)
 				{
-					_espacioAcumulado = MoveEaseIn(timeInSection, easeInAcceleration, InitialSpeed);
+					t = GetTinEase(AnimationTime, timeInBezier, 0, EaseInSection, 0);
 				}
-				if (fraccionRecorrida >= EaseInSection && fraccionRecorrida <= 1 - EaseOutSection)
+				if (t >= EaseInSection && t <= 1 - EaseOutSection)
 				{
 					// Sale del EaseIn
 					if (onEase)
 					{
 						onEase = false;
 						// Calcula Velocidad al principio del tramo (a*t + v0)
-						lastSectionSpeed = easeInAcceleration * timeInSection + InitialSpeed;
-						// Reinicia tiempo
-						timeInSection = Time.deltaTime;
-						// Acumular el espacio en el tramo anterior
-						lastSectionSpace = _espacioAcumulado;
+						lastSectionSpeed = acceleration * timeInBezier;
+						// La aceleracion es 0
+						acceleration = 0;
 					}
-					_espacioAcumulado = MoveConstantSpeed(timeInSection, lastSectionSpeed, lastSectionSpace);
+
+					t = GetTConstantSpeed(AnimationTime, timeInBezier, EaseInSection, 1 - EaseOutSection);
 				}
 
-				if (fraccionRecorrida > 1 - EaseOutSection)
+				if (t > 1 - EaseOutSection)
 				{
 					// Entra en el Ease Out
 					if (!onEase)
 					{
 						onEase = true;
-						// La velocidad inicial del tramo es la misma
-						// Reinicia el tiempo
-						timeInSection = Time.deltaTime;
-						// Acumular el espacio en el tramo anterior
-						lastSectionSpace = _espacioAcumulado;
+						// La velocidad del ultimo tramo es la misma
 					}
-					_espacioAcumulado = MoveEaseOut(timeInSection, easeOutDeceleration, lastSectionSpeed, lastSectionSpace);
+
+					t = GetTinEase(AnimationTime, timeInBezier, 1 - EaseOutSection, 1, lastSectionSpeed);
 				}
 			}
 			else // Sin Ease In Ease Out
 			{
-				_espacioAcumulado = MoveConstantSpeedByTime(animationTime, timeInSection);
+				t = GetTConstantSpeed(AnimationTime, timeInBezier);
 			}
 		}
 	}
@@ -112,84 +105,94 @@ public class BezierMovable : MonoBehaviour
 		transform.position = Bezier.GetBezierPointT(0);
 
 		if (RotationActivated)
-			transform.rotation = GetInitialRotation();
+			transform.rotation = RotateTowardsCurve(0);
 
 		// Variables dependientes de la posicion de la curva reseteadas
-		_espacioAcumulado = 0;
-		timeInSection = 0;
-		lastSectionSpace = 0;
-		lastSectionSpeed = InitialSpeed;
+		t = 0;
+		timeInBezier = 0;
+		lastSectionSpeed = 0;
 	}
 
-	// Ecuacion del espacio = velocidad * tiempo
-	private float MoveInBezier(float time, float initialSpeed, float initialSpace = 0, float acceleration = 0)
+	private Vector3 MoveToT(float t)
 	{
-		// s = v0 · t + (a · t^2) / 2
-		float espacio = (initialSpeed * time + (acceleration * Mathf.Pow(time, 2)) / 2) + initialSpace;
-		//print("Espacio Acumulado = " + espacio + " = " + initialSpeed + "·" + time + " + "
-		//	+ "1/2 · " + acceleration + "·" + time + "^2" + " + " + initialSpace);
-
-		// Espacio normalizado a t (parametro t en la curva con esa longitud con el punto inicial en un margen de error)
-		decimal t = Bezier.GetT((decimal)espacio);
-
-		// Mueve el objecto a la posicion de t en la curva
-		transform.position = Bezier.GetBezierPointT(t);
-
-		// Rotates it
-		if (RotationActivated)
-			RotateTowardsCurve(t, rotationSpeed);
-
-		//print("Intervalo t = " + ((t - bezier.GetT(_espacioAcumulado - espacio))) + "; Espacio recorrido = " + espacio);
-
-		return espacio;
+		return transform.position = Bezier.GetBezierPointT((decimal)t);
 	}
 
-	private float MoveEaseIn(float time, float acceleration, float initialSpeed = 0)
+	private float GetTConstantSpeed(float animationTime, float time, float t0 = 0, float t1 = 1)
 	{
-		return MoveInBezier(time, initialSpeed, 0, acceleration);
-	}
+		// Tiempo de animacion en el tramo
+		float easeAnimationTime = animationTime * (t1 - t0);
+		float timeInSection = time - t0 * animationTime;
 
-	private float MoveConstantSpeed(float time, float speed, float initialSpace = 0)
-	{
-		return MoveInBezier(time, speed, initialSpace);
-	}
-	private float MoveConstantSpeedByTime(float animationTime, float time)
-	{
-		float speed = Bezier.GetLenght() / animationTime;
+		// Punto inicial y final del tramo
+		float s0 = Bezier.GetDist((decimal)t0);
+		float s1 = Bezier.GetDist((decimal)t1);
 
-		float espacio = (speed * time);
+		float speed = (s1 - s0) / easeAnimationTime;
 
+		float espacio = (speed * timeInSection) + s0;
+
+		// Vuelve al inicio
 		if (espacio > Bezier.GetLenght())
 			espacio -= Bezier.GetLenght();
 
 		// Espacio normalizado a t (parametro t en la curva con esa longitud con el punto inicial en un margen de error)
-		decimal t = Bezier.GetT((decimal)espacio);
+		t = (float)Bezier.GetT(espacio);
 
-		// Mueve el objecto a la posicion de t en la curva
-		transform.position = Bezier.GetBezierPointT(t);
+		// Mueve el objeto a la posicion de t en la curva
+		MoveInBezier(t);
 
 		// Rotates it
 		if (RotationActivated)
-			RotateTowardsCurve(t, rotationSpeed);
+			RotateTowardsCurve(t);
 
-		return espacio;
+		return t;
 	}
 
-	private float MoveEaseOut(float time, float deceleration, float initialSpeed, float initialSpace = 0)
+	private float GetTinEase(float animationTime, float time, float t0, float t1,  float initialSpeed = 0)
 	{
-		return MoveInBezier(time, initialSpeed, initialSpace, -deceleration);
+		// Tiempo de animacion en el ease
+		float easeAnimationTime = animationTime * (t1 - t0);
+		float timeInSection = time - t0 * animationTime;
+
+		// Punto inicial y final del ease
+		float s0 = Bezier.GetDist((decimal)t0);
+		float s1 = Bezier.GetDist((decimal)t1);
+
+		// Despejando la aceleracion de su ecuacion se puede calcular a partir del tiempo
+		acceleration = (s1 - s0 - initialSpeed * easeAnimationTime) * 2 / easeAnimationTime/easeAnimationTime;
+
+		float espacio = (initialSpeed * timeInSection + (acceleration * timeInSection*timeInSection) / 2) + s0;
+
+		t = (float)Bezier.GetT(espacio);
+
+		MoveToT(t);
+
+		// Rotates it
+		if (RotationActivated)
+			RotateTowardsCurve(t);
+
+		return t;
 	}
 
-	private Quaternion RotateTowardsCurve(decimal t, float rotateSpeed = 1)
+	// Ecuacion del espacio = velocidad * tiempo
+	private void MoveInBezier(float t)
 	{
-		// Primera Direccion: Cogemos el primer segmento
-		if (t <= 0)
-		{
-			return transform.rotation = GetInitialRotation();
-		}
+		// Mueve el objecto a la posicion de t en la curva
+		MoveToT(t);
+
+		// Rotates it
+		if (RotationActivated)
+			RotateTowardsCurve(t);
+	}
+
+	private Quaternion RotateTowardsCurve(float t)
+	{
+		Vector3 curveVelocity = Bezier.GetVelocity(t).normalized;
+		Vector3 up = Vector3.Cross(Vector3.Cross(Bezier.GetAcceleration(t).normalized, curveVelocity), curveVelocity);
 
 		// Apunta en direccion de la Tangente de la Curva (Derivada)
-		Quaternion tangentQuat = Quaternion.LookRotation(Bezier.GetVelocity(t));
+		Quaternion tangentQuat = Quaternion.LookRotation(curveVelocity, up);
 
 		GetComponent<Rigidbody>().MoveRotation(
 			Quaternion.Slerp(
@@ -200,21 +203,5 @@ public class BezierMovable : MonoBehaviour
 			);
 
 		return tangentQuat;
-	}
-
-	private Quaternion GetInitialRotation()
-	{
-		// Puntos referencia:
-		var initPoint = Bezier.GetBezierPointT(0);
-		var finalPoint = Bezier.GetBezierPointT(0.01m);
-
-		// Direccion de Inicio-Final normalizada
-		Vector3 direction = (finalPoint - initPoint).normalized;
-		Vector3 up = Vector3.up;
-		if (Math.Abs((direction - Vector3.up).magnitude) < 0.01f)
-			up = Vector3.back;
-
-		//transform.rotation = Quaternion.LookRotation(direction);
-		return transform.rotation = Quaternion.LookRotation(direction, up);
 	}
 }
