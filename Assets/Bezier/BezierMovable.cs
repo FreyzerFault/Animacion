@@ -1,7 +1,9 @@
 using System;
 using System.Numerics;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 using Quaternion = UnityEngine.Quaternion;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
@@ -9,25 +11,29 @@ using Vector3 = UnityEngine.Vector3;
 public class BezierMovable : MonoBehaviour
 {
 	public Bezier Bezier;
+	[Space]
 	public bool InBezier = true;
+	[Space]
 	public bool RotationActivated = false;
 
-	public float AnimationTime = 5; // in seconds
+	[Space]
+	public float TotalAnimationTime = 5; // in seconds
 
 	// EASE IN + EASE OUT
+	[Header("Ease In / Out")]
 	public bool easeInOutActivated = false;
 
 	// Fraccion de la curva con Ease in Ease out [0,1]
-	public float EaseInSection = 0;
-	public float EaseOutSection = 0;
+	[Range(0, 1)] public float EaseInSection;
+	[Range(0, 1)] public float EaseOutSection;
 
-	private bool onEase = true;
-
-	[SerializeField] private float t;
 	
-	[SerializeField] private float timeInBezier = 0;
+	[Header("Movement")]
+	[SerializeField] private float t;
+	[SerializeField][InspectorName("Distance")] private float d;
+	[SerializeField] private float animationTime;
+	[SerializeField] private float speed;
 	[SerializeField] private float acceleration;
-	[SerializeField] private float lastSectionSpeed = 0;
 
 
 	// Start is called before the first frame update
@@ -36,33 +42,36 @@ public class BezierMovable : MonoBehaviour
 		if (Bezier)
 			ResetToInit();
 
-		if (EaseInSection + EaseOutSection >= 1)
-		{
-			print("Ease In y Ease Out no son coherentes (superan la fraccion de curva total)");
-			EaseInSection = 0;
-			EaseOutSection = 0;
-		}
 	}
 
 	// Update each frame
 	protected void Update()
 	{
 		float deltaTime = Time.inFixedTimeStep ? Time.fixedDeltaTime : Time.deltaTime;
-
+		
 		// Tiempo que lleva en una de las secciones de la curva para hacer ease In / Out
-		timeInBezier += deltaTime;
+		animationTime += deltaTime;
 
 		// Reset a la posicion inicial si se ha completado el recorrido
-		//if (timeInBezier >= AnimationTime)
-		//	ResetToInit();
+		if (animationTime >= TotalAnimationTime)
+			ResetToInit();
 
 		if (InBezier)
 		{
+			// Chekea que sean coherentes
+			if (EaseInSection + EaseOutSection > 1)
+			{
+				if (EaseInSection > EaseOutSection)
+					EaseOutSection = 1 - EaseInSection;
+				else
+					EaseInSection = 1 - EaseOutSection;
+			}
+
 			if (easeInOutActivated)
-				t = GetTeaseInOut(AnimationTime, EaseInSection, 1 - EaseOutSection, timeInBezier);
+				t = GetTeaseInOut(TotalAnimationTime, EaseInSection, 1 - EaseOutSection, animationTime);
 
 			else // Sin Ease In Ease Out
-				t = GetTConstantSpeed(AnimationTime, timeInBezier);
+				t = GetTConstantSpeed(TotalAnimationTime, animationTime);
 
 			MoveInBezier(t);
 		}
@@ -77,20 +86,16 @@ public class BezierMovable : MonoBehaviour
 			transform.rotation = RotateTowardsCurve(0);
 
 		// Variables dependientes de la posicion de la curva reseteadas
-		t = 0;
-		timeInBezier = 0;
+		animationTime = 0;
 	}
-
-	[SerializeField] private float d;
 
 	private float GetTeaseInOut(float animationTime, float t1, float t2, float time)
 	{
-		// Velocidad intermedia a partir del tiempo de animacion acotado al tramo intermedio
-		//float v0 = 1 / (animationTime * 0.9f);
-		float v0 = 0.5f;
+		// Velocidad normalizada despejada de la ecuacion del ease out [0,1]
+		//float v0 = 1 / (-t1/2 + 1 - (1-t2)/2);
+		float v0 = 1 / (-t1/2 + 1 - (1-t2)/2);
 
-		d = 0;
-
+		// Tiempo = [0,1] siendo 1 = segundos de animacion
 		float timeNormalized = Mathf.InverseLerp(0, animationTime, time);
 
 		// Ease IN
@@ -105,11 +110,34 @@ public class BezierMovable : MonoBehaviour
 		if (timeNormalized > t2)
 			d = v0 * t1 / 2 + v0 * (t2 - t1) + (v0 - (v0 * (timeNormalized - t2) / (1 - t2)) / 2) * (timeNormalized - t2);
 
-		return (float)Bezier.GetT(d * Bezier.GetLenght());
+		if (timeNormalized < t1)
+		{
+			acceleration = v0 / t1;
+			speed = v0 * timeNormalized / t1;
+		}
+		if (timeNormalized >= t1 && timeNormalized <= t2)
+		{
+			acceleration = 0;
+			speed = v0;
+		}
+		if (timeNormalized > t2)
+		{
+			acceleration = -v0 / (1 - t2);
+			speed = v0 * (1 - (timeNormalized - t2) / (1 - t2));
+		}
+
+		// Interpolacion lineal de [0,1] a [0, distancia total de la curva]
+		d *= Bezier.GetLenght();
+
+		return (float)Bezier.GetT(d);
 	}
 
 	private float GetTConstantSpeed(float animationTime, float time, float t0 = 0, float t1 = 1)
 	{
+		// Si el tramo es la curva entera se calcula directamente como (dTotal / tTotal * time)
+		if (t0 == 0 && t1 == 1)
+			return (float)Bezier.GetT((Bezier.GetLenght() / animationTime * time));
+
 		// Tiempo de animacion en el tramo
 		float easeAnimationTime = animationTime * (t1 - t0);
 		float timeInSection = time - t0 * animationTime;
@@ -127,35 +155,7 @@ public class BezierMovable : MonoBehaviour
 			espacio -= Bezier.GetLenght();
 
 		// Espacio normalizado a t (parametro t en la curva con esa longitud con el punto inicial en un margen de error)
-		t = (float)Bezier.GetT(espacio);
-
-		return t;
-	}
-
-	private float GetTinEase(float animationTime, float time, float t0, float t1,  float initialSpeed = 0)
-	{
-		// Tiempo de animacion en el ease
-		float easeAnimationTime = animationTime * (t1 - t0);
-		float timeInSection = time - t0 * animationTime;
-
-		// Punto inicial y final del ease
-		float s0 = Bezier.GetDist((decimal)t0);
-		float s1 = Bezier.GetDist((decimal)t1);
-
-		// Despejando la aceleracion de su ecuacion se puede calcular a partir del tiempo
-		acceleration = (s1 - s0 - initialSpeed * easeAnimationTime) * 2 / easeAnimationTime/easeAnimationTime;
-
-		float espacio = (initialSpeed * timeInSection + (acceleration * timeInSection*timeInSection) / 2) + s0;
-
-		t = (float)Bezier.GetT(espacio);
-
-		MoveToT(t);
-
-		// Rotates it
-		if (RotationActivated)
-			RotateTowardsCurve(t);
-
-		return t;
+		return (float)Bezier.GetT(espacio);
 	}
 
 	// Ecuacion del espacio = velocidad * tiempo
@@ -176,14 +176,19 @@ public class BezierMovable : MonoBehaviour
 
 	private Quaternion RotateTowardsCurve(float t)
 	{
+		// Los cuerpos con masa dan problemas con la rotacion
+		Rigidbody rb = GetComponent<Rigidbody>();
+		if (rb)
+			rb.mass = 0;
+
 		Vector3 curveVelocity = Bezier.GetVelocity(t).normalized;
 		Vector3 up = Vector3.Cross(Vector3.Cross(Bezier.GetAcceleration(t).normalized, curveVelocity), curveVelocity);
 
 		// Apunta en direccion de la Tangente de la Curva (Derivada)
 		Quaternion tangentQuat = Quaternion.LookRotation(curveVelocity, up);
 
-		if (GetComponent<Rigidbody>())
-			GetComponent<Rigidbody>().MoveRotation(
+		if (rb)
+			rb.MoveRotation(
 				Quaternion.Slerp(
 					transform.rotation,
 					tangentQuat,

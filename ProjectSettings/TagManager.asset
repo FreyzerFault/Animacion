@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Bezier Control Point
   - Bezier
+  - MainCanvas
   layers:
   - Default
   - TransparentFX
