@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class CameraTarget : MonoBehaviour
 {
+	public GameObject target;
+
 	// Start is called before the first frame update
 	void Start()
 	{
@@ -12,9 +14,13 @@ public class CameraTarget : MonoBehaviour
 	// Update is called once per frame
 	void LateUpdate()
 	{
-		Vector3 camPos = Camera.main.transform.position;
-		Vector3 targetPos = transform.position;
-		Quaternion camRotation = Camera.main.transform.rotation;
-		Camera.main.transform.rotation = Quaternion.Slerp(camRotation, Quaternion.LookRotation(targetPos - camPos), Time.deltaTime * 5);
+		if (target)
+		{
+			Vector3 camPos = transform.position;
+			Quaternion camRotation = transform.rotation;
+			Vector3 targetPos = target.transform.position;
+			transform.rotation = Quaternion.Slerp(camRotation, Quaternion.LookRotation(targetPos - camPos),
+				Time.deltaTime * 5);
+		}
 	}
 }

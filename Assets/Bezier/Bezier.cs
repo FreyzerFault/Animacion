@@ -199,6 +199,7 @@ public class Bezier : MonoBehaviour
 		// Vaciamos las LUT
 		LUTpuntosT.Clear();
 		LUTdistanceByT.Clear();
+		LUTpuntosT.Clear();
 
 		// El parametro de la linea t va incrementado segun la resolucion de la curva
 		decimal t = 0;
@@ -223,17 +224,6 @@ public class Bezier : MonoBehaviour
 			if (!LUTtByDistance.ContainsKey(distancia))
 				LUTtByDistance.Add(distancia, t);
 		}
-
-		//// Final
-		//// Punto t = 1 => Ultimo Punto de Control
-		//LUTpuntosT.Add(1, cpPositions[cpPositions.Length - 1]);
-		//// Distancia Acumulada t = 1 => (Ultimo Punto de Control - Punto de t = 1 - 0.00... (mas cercano a 1)) + Ditancia Acumulada en t = 1 - 0.00...
-		//float totalDistance = (
-		//	LUTpuntosT[1] - GetBezierPointT((float)(t - BezierResolution))).magnitude 
-		//                      + GetDist((float)(t - BezierResolution));
-		//LUTdistanceByT.Add(1, totalDistance);
-
-		//LUTtByDistance.Add(totalDistance, 1);
 	}
 
 	// COMBINATORIA (usa memoization)

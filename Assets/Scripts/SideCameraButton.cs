@@ -5,26 +5,25 @@ using UnityEngine.UI;
 
 public class SideCameraButton : MonoBehaviour
 {
-	private Camera mainCamera;
+	public Camera mainCamera;
 	public Camera upCamera;
 	public Camera sideCamera;
 
-	public Button ButtonMainCamera;
-	public Button ButtonUpCamera;
-	public Button ButtonSideCamera;
+	public GameObject ButtonMainCamera;
+	public GameObject ButtonUpCamera;
+	public GameObject ButtonSideCamera;
 
 	public void Awake()
 	{
-		mainCamera = Camera.main;
 	}
 
 	public void onClick()
 	{
-		mainCamera.gameObject.SetActive(true);
-		upCamera.gameObject.SetActive(false);
-		sideCamera.gameObject.SetActive(true);
-		ButtonMainCamera.gameObject.SetActive(true);
-		ButtonUpCamera.gameObject.SetActive(true);
-		ButtonSideCamera.gameObject.SetActive(false);
+		mainCamera.enabled = false;
+		upCamera.enabled = false;
+		sideCamera.enabled = true;
+		//ButtonMainCamera.SetActive(true);
+		//ButtonUpCamera.SetActive(true);
+		//ButtonSideCamera.SetActive(false);
 	}
 }

@@ -146,7 +146,8 @@ public class BezierMovable : MonoBehaviour
 		float s0 = Bezier.GetDist((decimal)t0);
 		float s1 = Bezier.GetDist((decimal)t1);
 
-		float speed = (s1 - s0) / easeAnimationTime;
+		speed = (s1 - s0) / easeAnimationTime;
+		acceleration = 0;
 
 		float espacio = (speed * timeInSection) + s0;
 

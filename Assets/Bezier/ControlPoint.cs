@@ -18,21 +18,22 @@ public class ControlPoint : MonoBehaviour
 	{
 		// Si se mueve un punto de control actualizamos Bezier
 		Bezier bezier = GetComponentInParent<Bezier>();
+
+		if (!bezier)
+			print("No hay Bezier asignada a " + this.ToString());
+
 		if (transform.hasChanged && bezier)
 		{
 			bezier.UpdateControlPoints();
 			bezier.UpdateLineRenderer();
+			transform.hasChanged = false;
 		}
-		if (!bezier)
-			print("No hay Bezier asignada a " + this.ToString());
 
-		// Se muestran si esta en el Editor
-		if (Application.isEditor)
-			this.GetComponent<MeshRenderer>().enabled = true;
-		
 		// Se controla si se esconde o no en el juego
 		if (Application.isPlaying)
-			this.GetComponent<MeshRenderer>().enabled = bezier.renderControlPoints;
+			this.gameObject.SetActive(bezier.renderControlPoints);
+		else
+			this.gameObject.SetActive(true);
 	}
 
 	void OnMouseDrag()
