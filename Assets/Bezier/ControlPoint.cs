@@ -30,10 +30,11 @@ public class ControlPoint : MonoBehaviour
 		}
 
 		// Se controla si se esconde o no en el juego
+		MeshRenderer mesh = this.gameObject.GetComponent<MeshRenderer>();
 		if (Application.isPlaying)
-			this.gameObject.SetActive(bezier.renderControlPoints);
+			mesh.enabled = bezier.renderControlPoints;
 		else
-			this.gameObject.SetActive(true);
+			mesh.enabled = true;
 	}
 
 	void OnMouseDrag()

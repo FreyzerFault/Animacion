@@ -13,6 +13,11 @@ public static class ExtensionMethods
 	{
 		return (value - in0) / (in1 - in0) * (out1 - out0) + out0;
 	}
+	
+	public static decimal Remap(this decimal value, decimal in0, decimal in1, decimal out0, decimal out1)
+	{
+		return (value - in0) / (in1 - in0) * (out1 - out0) + out0;
+	}
 }
 [ExecuteAlways]
 public class Bezier : MonoBehaviour
@@ -114,7 +119,8 @@ public class Bezier : MonoBehaviour
 	// Longitud de la Curva
 	public float GetLenght()
 	{
-		return LUTdistanceByT[1];
+		float length = LUTdistanceByT[1];
+		return length;
 	}
 
 
@@ -137,7 +143,7 @@ public class Bezier : MonoBehaviour
 			{
 				decimal t1 = t0 + BezierResolution;
 				// Remapeado del rango [t0,t1] a [d0,d1] por Interpolacion Lineal
-				return ((float)t).Remap((float)t0, (float)t1, LUTdistanceByT[t0], LUTdistanceByT[t1]);
+				return (float)t.Remap(t0, t1, (decimal)LUTdistanceByT[t0], (decimal)LUTdistanceByT[t1]);
 			}
 		}
 
@@ -151,7 +157,9 @@ public class Bezier : MonoBehaviour
 		// Casos Triviales:
 		// Si se sale de la curva extrapolar
 		if (distance <= 0 || distance >= GetLenght())
+		{
 			return (decimal)(distance / GetLenght());
+		}
 
 		// Last distance
 		float s0 = 0;
@@ -160,12 +168,12 @@ public class Bezier : MonoBehaviour
 		{
 			if (distance <= s1 && distance >= s0)
 			{
-				float t0 = (float)LUTtByDistance[s0];
-				float t1 = (float)LUTtByDistance[s1];
+				decimal t0 = LUTtByDistance[s0];
+				decimal t1 = LUTtByDistance[s1];
 				
 				// INTERPOLACION entre los dos puntos t (% deltaS => % deltaT)
 				// t = (fraccion de distancia que sobrepasa) * (segmento t) + t0
-				return (decimal)distance.Remap(s0, s1, t0, t1);
+				return ((decimal)distance).Remap((decimal)s0, (decimal)s1, t0, t1);
 			}
 			s0 = s1;
 		}
@@ -199,7 +207,7 @@ public class Bezier : MonoBehaviour
 		// Vaciamos las LUT
 		LUTpuntosT.Clear();
 		LUTdistanceByT.Clear();
-		LUTpuntosT.Clear();
+		LUTtByDistance.Clear();
 
 		// El parametro de la linea t va incrementado segun la resolucion de la curva
 		decimal t = 0;

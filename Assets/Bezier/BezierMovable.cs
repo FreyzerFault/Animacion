@@ -34,6 +34,7 @@ public class BezierMovable : MonoBehaviour
 	[SerializeField] private float animationTime;
 	[SerializeField] private float speed;
 	[SerializeField] private float acceleration;
+	[SerializeField] private float tiempoNormalizado;
 
 
 	// Start is called before the first frame update
@@ -92,35 +93,36 @@ public class BezierMovable : MonoBehaviour
 	private float GetTeaseInOut(float animationTime, float t1, float t2, float time)
 	{
 		// Velocidad normalizada despejada de la ecuacion del ease out [0,1]
-		//float v0 = 1 / (-t1/2 + 1 - (1-t2)/2);
 		float v0 = 1 / (-t1/2 + 1 - (1-t2)/2);
 
 		// Tiempo = [0,1] siendo 1 = segundos de animacion
 		float timeNormalized = Mathf.InverseLerp(0, animationTime, time);
 
+		tiempoNormalizado = timeNormalized;
+
 		// Ease IN
-		if (timeNormalized < t1)
+		if (tiempoNormalizado < t1)
 			d = v0 * timeNormalized * timeNormalized / 2 / t1;
 
 		// Ease Middle
-		if (timeNormalized >= t1 && timeNormalized <= t2)
+		if (tiempoNormalizado >= t1 && tiempoNormalizado <= t2)
 			d = v0 * t1 / 2 + v0 * (timeNormalized - t1);
 
 		// Ease OUT
-		if (timeNormalized > t2)
+		if (tiempoNormalizado > t2)
 			d = v0 * t1 / 2 + v0 * (t2 - t1) + (v0 - (v0 * (timeNormalized - t2) / (1 - t2)) / 2) * (timeNormalized - t2);
 
-		if (timeNormalized < t1)
+		if (tiempoNormalizado < t1)
 		{
 			acceleration = v0 / t1;
 			speed = v0 * timeNormalized / t1;
 		}
-		if (timeNormalized >= t1 && timeNormalized <= t2)
+		if (tiempoNormalizado >= t1 && tiempoNormalizado <= t2)
 		{
 			acceleration = 0;
 			speed = v0;
 		}
-		if (timeNormalized > t2)
+		if (tiempoNormalizado > t2)
 		{
 			acceleration = -v0 / (1 - t2);
 			speed = v0 * (1 - (timeNormalized - t2) / (1 - t2));
@@ -135,7 +137,7 @@ public class BezierMovable : MonoBehaviour
 	private float GetTConstantSpeed(float animationTime, float time, float t0 = 0, float t1 = 1)
 	{
 		// Si el tramo es la curva entera se calcula directamente como (dTotal / tTotal * time)
-		if (t0 == 0 && t1 == 1)
+		if (t0 <= 0 && t1 >= 1)
 			return (float)Bezier.GetT((Bezier.GetLenght() / animationTime * time));
 
 		// Tiempo de animacion en el tramo
