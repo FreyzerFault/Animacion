@@ -16,6 +16,8 @@ public class BezierMovable : MonoBehaviour
 	[Space]
 	public bool RotationActivated = false;
 
+	public bool upRollRotationActivated = false;
+
 	[Space]
 	public float TotalAnimationTime = 5; // in seconds
 
@@ -42,6 +44,11 @@ public class BezierMovable : MonoBehaviour
 	{
 		if (Bezier)
 			ResetToInit();
+
+		// Desactivamos la gravedad para que no haga cosas raras
+		Rigidbody rb = GetComponent<Rigidbody>();
+		if (rb)
+			rb.useGravity = false;
 
 	}
 
@@ -181,11 +188,12 @@ public class BezierMovable : MonoBehaviour
 	{
 		// Los cuerpos con masa dan problemas con la rotacion
 		Rigidbody rb = GetComponent<Rigidbody>();
-		if (rb)
-			rb.mass = 0;
 
 		Vector3 curveVelocity = Bezier.GetVelocity(t).normalized;
-		Vector3 up = Vector3.Cross(Vector3.Cross(Bezier.GetAcceleration(t).normalized, curveVelocity), curveVelocity);
+
+		Vector3 up = Vector3.up;
+		if (upRollRotationActivated)
+			up = Vector3.Cross(Vector3.Cross(Bezier.GetAcceleration(t).normalized, curveVelocity), curveVelocity);
 
 		// Apunta en direccion de la Tangente de la Curva (Derivada)
 		Quaternion tangentQuat = Quaternion.LookRotation(curveVelocity, up);
