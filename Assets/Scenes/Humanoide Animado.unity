@@ -3066,6 +3066,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7301084750709558948, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
+      propertyPath: m_Icon
+      value: 
+      objectReference: {fileID: 4422084297763085224, guid: 0000000000000000d000000000000000, type: 0}
+    - target: {fileID: 7301084750709558948, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
       propertyPath: m_Name
       value: Aircraft Bezier
       objectReference: {fileID: 0}
