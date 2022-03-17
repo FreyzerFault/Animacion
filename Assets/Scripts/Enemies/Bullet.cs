@@ -18,13 +18,13 @@ public class Bullet : MonoBehaviour
 		timeAlive += Time.deltaTime;
 
 		if (timeAlive > MaxTimeAlive)
-			disappear();
+			Disappear();
 	}
 
 	// Update is called once per frame
 	void OnTriggerEnter(Collider other)
 	{
-		disappear();
+		Disappear();
 
 		if (other.GetComponent<Collider>() == GameObject.FindGameObjectWithTag("Player").GetComponent<Collider>())
 		{
@@ -32,9 +32,9 @@ public class Bullet : MonoBehaviour
 		}
 	}
 
-	void disappear()
+	void Disappear()
 	{
-		GetComponentInParent<EnemyShoot>().disapearBullet(this.gameObject);
+		GetComponentInParent<EnemyShoot>().DisapearBullet(this.gameObject);
 		timeAlive = 0;
 	}
 }

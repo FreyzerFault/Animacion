@@ -15,11 +15,8 @@ public class EnemyShoot : MonoBehaviour
 
 	private Vector3 BulletInitPosition;
 
-	private bool rotateTowardsPlayer = false;
-
-
 	// Start is called before the first frame update
-	void Awake()
+	void Start()
 	{
 		target = GameObject.FindGameObjectWithTag("Player");
 
@@ -30,26 +27,18 @@ public class EnemyShoot : MonoBehaviour
 		for (int i = 0; i < numBullets; i++)
 		{
 			GameObject bullet = Instantiate(bulletPrefab, transform);
-			// Para que salga a la altura de los ojos
-			bullet.transform.position += Vector3.up * 2;
 			bulletsPool.Add(bullet);
 			bullet.SetActive(false);
 		}
-	}
 
-	void Start()
-	{
 		StartCoroutine(ShootRoutine());
-		StartCoroutine(CheckIfPlayerInFront());
-
-		if (rotateTowardsPlayer)
-		{
-
-			Vector3 targetDir = (target.transform.position - transform.position).normalized;
-			transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(targetDir), rotationSpeed * Time.deltaTime);
-		}
 	}
 
+	void Update()
+	{
+		Vector3 targetDir = (target.transform.position - transform.position).normalized;
+		transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(targetDir), rotationSpeed * Time.deltaTime);
+	}
 
 	IEnumerator ShootRoutine()
 	{
@@ -74,30 +63,14 @@ public class EnemyShoot : MonoBehaviour
 			rb.AddForce(shootDirection * shootForce);
 			bullet.transform.rotation = Quaternion.LookRotation(shootDirection);
 			bullet.transform.position = BulletInitPosition;
+
+			Physics.IgnoreCollision(bullet.GetComponent<Collider>(), GetComponent<Collider>());
 		}
 	}
 
-	IEnumerator CheckIfPlayerInFront()
+
+	public void DisapearBullet(GameObject bullet)
 	{
-		while (true)
-		{
-			yield return new WaitForSeconds(Mathf.Abs(Random.value - 0.5f));
-
-			print("Rotate");
-
-			// Mover de la Pool a la lista de activos
-			Vector3 targetDir = (target.transform.position - transform.position).normalized;
-			Vector3 enemyForward = transform.forward.normalized;
-
-			// Si el DOT es menos de 1 es que no tienen similar direccion
-			rotateTowardsPlayer = Vector3.Dot(targetDir, enemyForward) < 0.9;
-		}
-	}
-
-	public void disapearBullet(GameObject bullet)
-	{
-		print("Bullet volvio a la Pool");
-		
 		// Mover de la Pool a la lista de activos
 		bullet.transform.position = transform.position;
 		bullet.GetComponent<Rigidbody>().velocity = Vector3.zero;

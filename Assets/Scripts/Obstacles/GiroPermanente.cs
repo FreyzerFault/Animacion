@@ -1,13 +1,17 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class GiroPermanente : MonoBehaviour
 {
 	public float bounceForce;
 	public float rotationSpeed;
+
+	public bool randomRotation = true;
 
 	private GameObject player;
 	private Rigidbody m_PlayerBody;
@@ -22,17 +26,27 @@ public class GiroPermanente : MonoBehaviour
 		}
 		player = GameObject.FindGameObjectWithTag("Player");
 		m_PlayerBody = player.GetComponent<Rigidbody>();
+
+		// Random rotation [-10,10] + rotaticion ( y la direccion de la rotacion es aleatoria
+		if (randomRotation)
+		{
+			if (Random.value > 0.5)
+				rotationSpeed = -rotationSpeed;
+
+			rotationSpeed = rotationSpeed + Random.Range(-10, 10);
+		}
+			
 	}
 
 	// Update is called once per frame
 	void FixedUpdate()
 	{
-		Rotate();
+		Rotate(Time.inFixedTimeStep ? Time.fixedDeltaTime : Time.deltaTime);
 	}
 
-	void Rotate()
+	void Rotate(float time)
 	{
-		transform.Rotate(Vector3.down, Time.deltaTime * rotationSpeed);
+		transform.Rotate(Vector3.down, Time.fixedDeltaTime * rotationSpeed);
 	}
 
 	private Collision m_Collision;

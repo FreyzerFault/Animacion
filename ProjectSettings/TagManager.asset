@@ -7,6 +7,11 @@ TagManager:
   - Bezier Control Point
   - Bezier
   - MainCanvas
+  - Alerta
+  - Obstacle
+  - TimeText
+  - Region
+  - Spawner
   layers:
   - Default
   - TransparentFX
@@ -14,7 +19,7 @@ TagManager:
   - 
   - Water
   - UI
-  - 
+  - SpawnerRegion
   - 
   - 
   - 
