@@ -350,11 +350,39 @@ PrefabInstance:
       value: 34
       objectReference: {fileID: 0}
     - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
+      propertyPath: RenderLine
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
       propertyPath: renderLine
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
+      propertyPath: ObjectMoving
+      value: 
+      objectReference: {fileID: 963194225}
+    - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
+      propertyPath: objectMoving
+      value: 
+      objectReference: {fileID: 963194225}
+    - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
+      propertyPath: Move.EaseInSection
+      value: 0.247
+      objectReference: {fileID: 0}
+    - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
+      propertyPath: Move.EaseOutSection
+      value: 0.702
+      objectReference: {fileID: 0}
+    - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
+      propertyPath: RenderControlPoints
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
       propertyPath: renderControlPoints
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
+      propertyPath: Move.RotationActivated
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
@@ -480,6 +508,14 @@ PrefabInstance:
     - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
       propertyPath: points.Array.data[9].z
       value: -92.67106
+      objectReference: {fileID: 0}
+    - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
+      propertyPath: Move.TotalAnimationTime
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
+      propertyPath: Move.easeInOutActivated
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
       propertyPath: points.Array.data[10].x
@@ -3574,18 +3610,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Bezier: {fileID: 1145388791}
-  InBezier: 1
-  RotationActivated: 0
-  TotalAnimationTime: 5
-  easeInOutActivated: 0
-  EaseInSection: 0
-  EaseOutSection: 0
-  t: 0
-  d: 0
-  animationTime: 0
-  speed: 0
-  acceleration: 0
-  tiempoNormalizado: 0
+  Beziers: []
 --- !u!114 &963194230
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3875,18 +3900,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Bezier: {fileID: 2082739047}
-  InBezier: 1
-  RotationActivated: 1
-  TotalAnimationTime: 5
-  easeInOutActivated: 1
-  EaseInSection: 0.359
-  EaseOutSection: 0.363
-  t: 0
-  d: 0
-  animationTime: 0
-  speed: 0
-  acceleration: 0
-  tiempoNormalizado: 0
+  Beziers: []
 --- !u!1001 &1563051682
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4416,7 +4430,31 @@ PrefabInstance:
       value: -22.92
       objectReference: {fileID: 0}
     - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
+      propertyPath: RenderLine
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
       propertyPath: renderLine
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
+      propertyPath: ObjectMoving
+      value: 
+      objectReference: {fileID: 1336453247}
+    - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
+      propertyPath: objectMoving
+      value: 
+      objectReference: {fileID: 1336453247}
+    - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
+      propertyPath: Move.EaseInSection
+      value: 0.248
+      objectReference: {fileID: 0}
+    - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
+      propertyPath: Move.EaseOutSection
+      value: 0.259
+      objectReference: {fileID: 0}
+    - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
+      propertyPath: RenderControlPoints
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
@@ -4424,12 +4462,24 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
+      propertyPath: Move.RotationActivated
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
+      propertyPath: Move.TotalAnimationTime
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
+      propertyPath: Move.easeInOutActivated
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
       propertyPath: cpPositions.Array.data[0].x
-      value: 0.3
+      value: -6.58
       objectReference: {fileID: 0}
     - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
       propertyPath: cpPositions.Array.data[0].y
-      value: -8.21
+      value: 8.48
       objectReference: {fileID: 0}
     - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
       propertyPath: cpPositions.Array.data[0].z
@@ -4441,7 +4491,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
       propertyPath: cpPositions.Array.data[1].y
-      value: 11.5
+      value: -26.1
       objectReference: {fileID: 0}
     - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
       propertyPath: cpPositions.Array.data[1].z
@@ -4457,7 +4507,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
       propertyPath: cpPositions.Array.data[2].z
-      value: 18.3
+      value: 32.9
       objectReference: {fileID: 0}
     - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
       propertyPath: cpPositions.Array.data[3].x
@@ -4469,7 +4519,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
       propertyPath: cpPositions.Array.data[3].z
-      value: 6.13
+      value: -13.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 2154273876214995170, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
+      propertyPath: Move.upRollRotationActivated
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2154273876214995180, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2154273876214995180, guid: cec4f1076ef00514eba6f17692bd91e9, type: 3}
       propertyPath: m_Positions.Array.size

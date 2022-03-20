@@ -32,7 +32,7 @@ public class ControlPoint : MonoBehaviour
 		// Se controla si se esconde o no en el juego
 		MeshRenderer mesh = this.gameObject.GetComponent<MeshRenderer>();
 		if (Application.isPlaying)
-			mesh.enabled = bezier.renderControlPoints;
+			mesh.enabled = bezier.RenderControlPoints;
 		else
 			mesh.enabled = true;
 	}

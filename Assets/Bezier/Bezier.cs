@@ -22,13 +22,50 @@ public static class ExtensionMethods
 [ExecuteAlways]
 public class Bezier : MonoBehaviour
 {
-	public LineRenderer lineRenderer;
-	public bool renderLine = true;
-	public bool renderControlPoints = true;
-	
 	public Vector3[] cpPositions;
-
 	public decimal BezierResolution = 0.01m;
+
+	[Space]
+	public GameObject ObjectMoving;
+	private bool moving = false;
+
+	[Space]
+	public bool RenderLine = true;
+	public bool RenderControlPoints = true;
+
+	private LineRenderer lineRenderer;
+
+
+
+	[Serializable]
+	public class MovementSettings
+	{
+		[Space]
+		public bool RotationActivated = false;
+		public bool upRollRotationActivated = false;
+
+		[Space]
+		public float TotalAnimationTime = 5; // in seconds
+
+		// EASE IN + EASE OUT
+		[Header("Ease In / Out")]
+		// Fraccion de la curva con Ease in Ease out [0,1]
+		[Range(0, 1)] public float EaseInSection;
+		[Range(0, 1)] public float EaseOutSection;
+
+		[Space]
+		[Header("Parameters:")]
+		[SerializeField] public float t;
+		[SerializeField][InspectorName("Distance")] public float distance;
+		[SerializeField] public float animationTime;
+		[SerializeField] public float speed;
+		[SerializeField] public float acceleration;
+		[SerializeField] public float tiempoNormalizado;
+	}
+
+	[Space]
+	public MovementSettings Move;
+
 
 	// Look Up Table con los puntos de la curva (Vec3) segun la t
 	private readonly Dictionary<decimal, Vector3> LUTpuntosT = new Dictionary<decimal, Vector3>();
@@ -40,6 +77,7 @@ public class Bezier : MonoBehaviour
 	private readonly Dictionary<float, decimal> LUTtByDistance = new Dictionary<float, decimal>();
 
 	// Start is called before the first frame update
+
 	void Awake()
 	{
 		lineRenderer = GetComponent<LineRenderer>();
@@ -50,11 +88,53 @@ public class Bezier : MonoBehaviour
 		UpdateLineRenderer();
 	}
 
-	// Update is called once per frame
+
 	void Update()
 	{
 		// line Renderer activado & esta en PlayMode
-		lineRenderer.enabled = renderLine && Application.isPlaying;
+		lineRenderer.enabled = RenderLine && Application.isPlaying;
+
+		// MOVIMIENTO POR LA CURVA:
+		if (moving)
+		{
+			float deltaTime = Time.inFixedTimeStep ? Time.fixedDeltaTime : Time.deltaTime;
+
+			if (AnimationFinished())
+				ResetToInit();
+
+			// Tiempo que lleva en una de las secciones de la curva para hacer ease In / Out
+			Move.animationTime += deltaTime;
+
+			// Chekea que sean coherentes
+			if (Move.EaseInSection + Move.EaseOutSection > 1)
+			{
+				if (Move.EaseInSection > Move.EaseOutSection)
+					Move.EaseOutSection = 1 - Move.EaseInSection;
+				else
+					Move.EaseInSection = 1 - Move.EaseOutSection;
+			}
+
+			if (easeInOutActivated())
+				Move.t = GetTeaseInOut(Move.TotalAnimationTime, Move.EaseInSection, 1 - Move.EaseOutSection, Move.animationTime);
+
+			else // Sin Ease In Ease Out
+				Move.t = GetTConstantSpeed(Move.TotalAnimationTime, Move.animationTime);
+
+			MoveInBezier(Move.t);
+		}
+		
+	}
+
+
+
+
+	public ControlPoint getControlPoint(int index)
+	{
+		ControlPoint[] cps = GetComponentsInChildren<ControlPoint>();
+		if (cps[index])
+			return cps[index];
+
+		return null;
 	}
 
 
@@ -262,6 +342,191 @@ public class Bezier : MonoBehaviour
 
 		_combCache.Add(key, comb / factorial);
 		return _combCache[key];
+	}
+
+
+
+	// =========================== Animaciones ===========================
+
+	private float GetTeaseInOut(float animationTime, float t1, float t2, float time)
+	{
+		// Velocidad normalizada despejada de la ecuacion del ease out [0,1]
+		float v0 = 1 / (-t1 / 2 + 1 - (1 - t2) / 2);
+
+		// Tiempo = [0,1] siendo 1 = segundos de animacion
+		float timeNormalized = Mathf.InverseLerp(0, animationTime, time);
+
+		float d = 0;
+
+		// Ease IN
+		if (timeNormalized < t1)
+			d = v0 * timeNormalized * timeNormalized / 2 / t1;
+
+		// Ease Middle
+		if (timeNormalized >= t1 && timeNormalized <= t2)
+			d = v0 * t1 / 2 + v0 * (timeNormalized - t1);
+
+		// Ease OUT
+		if (timeNormalized > t2)
+			d = v0 * t1 / 2 + v0 * (t2 - t1) + (v0 - (v0 * (timeNormalized - t2) / (1 - t2)) / 2) * (timeNormalized - t2);
+
+		Move.tiempoNormalizado = timeNormalized;
+		Move.distance = d;
+		if (timeNormalized < t1)
+		{
+			Move.acceleration = v0 / t1;
+			Move.speed = v0 * timeNormalized / t1;
+		}
+		if (timeNormalized >= t1 && Move.tiempoNormalizado <= t2)
+		{
+			Move.acceleration = 0;
+			Move.speed = v0;
+		}
+		if (timeNormalized > t2)
+		{
+			Move.acceleration = -v0 / (1 - t2);
+			Move.speed = v0 * (1 - (timeNormalized - t2) / (1 - t2));
+		}
+
+		// Interpolacion lineal de [0,1] a [0, distancia total de la curva]
+		d *= GetLenght();
+
+		return (float)GetT(d);
+	}
+
+	private float GetTConstantSpeed(float animationTime, float time, float t0 = 0, float t1 = 1)
+	{
+		// Si el tramo es la curva entera se calcula directamente como (dTotal / tTotal * time)
+		if (t0 <= 0 && t1 >= 1)
+			return (float)GetT((GetLenght() / animationTime * time));
+
+		// Tiempo de animacion en el tramo
+		float easeAnimationTime = animationTime * (t1 - t0);
+		float timeInSection = time - t0 * animationTime;
+
+		// Punto inicial y final del tramo
+		float s0 = GetDist((decimal)t0);
+		float s1 = GetDist((decimal)t1);
+
+		float speed = (s1 - s0) / easeAnimationTime;
+
+		float espacio = (Move.speed * timeInSection) + s0;
+
+		// Vuelve al inicio
+		if (espacio > GetLenght())
+			espacio -= GetLenght();
+
+
+		Move.speed = speed;
+		Move.acceleration = 0;
+		Move.distance = espacio;
+		Move.animationTime = timeInSection;
+
+		// Espacio normalizado a t (parametro t en la curva con esa longitud con el punto inicial en un margen de error)
+		return (float)GetT(espacio);
+	}
+
+
+	public void SetObjectMoving(GameObject obj) { ObjectMoving = obj; }
+
+	// Ultimo valor de la Gravedad del Objeto
+	private bool gravityWasActive;
+	// Activa el movimiento si hay un objeto asociado y le quita la gravedad
+	public bool StartMoving()
+	{
+		if (ObjectMoving)
+		{
+			ResetToInit();
+
+			// Desactivamos la gravedad para que no haga cosas raras
+			Rigidbody rb = ObjectMoving.GetComponent<Rigidbody>();
+			if (rb)
+			{
+				gravityWasActive = rb.useGravity;
+				if (rb && gravityWasActive)
+					rb.useGravity = false;
+			}
+			moving = true;
+			return true;
+		}
+
+		return false;
+	}
+
+	// Cuando acaba la animacion desactiva el movimiento y devuelve los parametros de gravedad al objeto
+	public void StopMoving()
+	{
+		// Volvemos a activar la gravedad si estaba activa
+		Rigidbody rb = ObjectMoving.GetComponent<Rigidbody>();
+		rb.useGravity = gravityWasActive;
+
+		ObjectMoving = null;
+		moving = false;
+	}
+
+	// Ha acabado el tiempo de Animacion
+	public bool AnimationFinished() { return Move.animationTime >= Move.TotalAnimationTime; }
+
+
+	private void ResetToInit()
+	{
+		if (Move.RotationActivated)
+			ObjectMoving.transform.rotation = RotateTowardsCurve(0);
+
+		// Variables dependientes de la posicion de la curva reseteadas
+		Move.animationTime = 0;
+	}
+
+	private void MoveInBezier(float t)
+	{
+		// Mueve el objecto a la posicion de t en la curva
+		MoveToT(t);
+
+		// Rotates it
+		if (Move.RotationActivated)
+			RotateTowardsCurve(t);
+	}
+
+	private Vector3 MoveToT(float t)
+	{
+		return ObjectMoving.transform.position = GetBezierPointT((decimal)t);
+	}
+
+	private Quaternion RotateTowardsCurve(float t)
+	{
+		// Los cuerpos con masa dan problemas con la rotacion
+		Rigidbody rb = ObjectMoving.GetComponent<Rigidbody>();
+
+		Vector3 curveVelocity = GetVelocity(t).normalized;
+
+		Vector3 up = Vector3.up;
+		if (Move.upRollRotationActivated)
+			up = Vector3.Cross(Vector3.Cross(GetAcceleration(t).normalized, curveVelocity), curveVelocity);
+
+		// Apunta en direccion de la Tangente de la Curva (Derivada)
+		Quaternion tangentQuat = Quaternion.LookRotation(curveVelocity, up);
+
+		if (rb)
+			rb.MoveRotation(
+				Quaternion.Slerp(
+					ObjectMoving.transform.rotation,
+					tangentQuat,
+					(Time.inFixedTimeStep ? Time.fixedDeltaTime : Time.deltaTime) * GetAcceleration(t).magnitude
+				)
+			);
+		else
+			ObjectMoving.transform.rotation = Quaternion.Slerp(
+				ObjectMoving.transform.rotation,
+				tangentQuat,
+				(Time.inFixedTimeStep ? Time.fixedDeltaTime : Time.deltaTime) * GetAcceleration(t).magnitude
+			);
+
+		return tangentQuat;
+	}
+
+	public bool easeInOutActivated()
+	{
+		return Move.EaseInSection > 0 || Move.EaseOutSection > 0;
 	}
 
 	// =========================== GIZMO ===========================

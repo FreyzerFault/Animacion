@@ -14,7 +14,7 @@ GameObject:
   m_Layer: 5
   m_Name: Bezier
   m_TagString: Bezier
-  m_Icon: {fileID: -964228994112308473, guid: 0000000000000000d000000000000000, type: 0}
+  m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -311,7 +311,7 @@ PrefabInstance:
       objectReference: {fileID: 2154273876214995170}
     - target: {fileID: 7429040198882533625, guid: 9e7d831619ecbd94a975c57a4f9865d9, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9043571824036299694, guid: 9e7d831619ecbd94a975c57a4f9865d9, type: 3}
       propertyPath: m_Name
@@ -381,7 +381,7 @@ PrefabInstance:
       objectReference: {fileID: 2154273876214995170}
     - target: {fileID: 7429040198882533625, guid: 9e7d831619ecbd94a975c57a4f9865d9, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9043571824036299694, guid: 9e7d831619ecbd94a975c57a4f9865d9, type: 3}
       propertyPath: m_Name
@@ -463,7 +463,7 @@ PrefabInstance:
       objectReference: {fileID: 2154273876214995170}
     - target: {fileID: 7429040198882533625, guid: 9e7d831619ecbd94a975c57a4f9865d9, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9043571824036299694, guid: 9e7d831619ecbd94a975c57a4f9865d9, type: 3}
       propertyPath: m_Name
@@ -533,7 +533,7 @@ PrefabInstance:
       objectReference: {fileID: 2154273876214995170}
     - target: {fileID: 7429040198882533625, guid: 9e7d831619ecbd94a975c57a4f9865d9, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9043571824036299694, guid: 9e7d831619ecbd94a975c57a4f9865d9, type: 3}
       propertyPath: m_Name
