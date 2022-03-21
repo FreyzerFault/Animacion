@@ -14,7 +14,7 @@ public class ThrowPlane : MonoBehaviour
 	private bool planeThrowed = false;
 
 	// Start is called before the first frame update
-	void Start()
+	void Awake()
 	{
 		animator = GetComponent<Animator>();
 
@@ -33,7 +33,7 @@ public class ThrowPlane : MonoBehaviour
 			// Activa la animacion de lanzar el avion
 			animator.SetBool("throwPlane", true);
 			
-			if (!planeThrowed && time > 3.5)
+			if (!planeThrowed && time > 3.2)
 			{
 				planeThrowed = true;
 				// Se lanza por la Curva

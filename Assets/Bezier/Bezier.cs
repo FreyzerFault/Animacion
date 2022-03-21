@@ -47,6 +47,9 @@ public class Bezier : MonoBehaviour
 		[Space]
 		public float TotalAnimationTime = 5; // in seconds
 
+		[Space]
+		public AnimationCurve spaceCurve;
+
 		// EASE IN + EASE OUT
 		[Header("Ease In / Out")]
 		// Fraccion de la curva con Ease in Ease out [0,1]
@@ -65,6 +68,8 @@ public class Bezier : MonoBehaviour
 
 	[Space]
 	public MovementSettings Move;
+
+	private float deltaTime;
 
 
 	// Look Up Table con los puntos de la curva (Vec3) segun la t
@@ -97,7 +102,7 @@ public class Bezier : MonoBehaviour
 		// MOVIMIENTO POR LA CURVA:
 		if (moving)
 		{
-			float deltaTime = Time.inFixedTimeStep ? Time.fixedDeltaTime : Time.deltaTime;
+			deltaTime = Time.inFixedTimeStep ? Time.fixedDeltaTime : Time.deltaTime;
 
 			if (AnimationFinished())
 				ResetToInit();
@@ -116,9 +121,16 @@ public class Bezier : MonoBehaviour
 
 			if (easeInOutActivated())
 				Move.t = GetTeaseInOut(Move.TotalAnimationTime, Move.EaseInSection, 1 - Move.EaseOutSection, Move.animationTime);
+			else
+			{	// Sin Ease In Ease Out
 
-			else // Sin Ease In Ease Out
-				Move.t = GetTConstantSpeed(Move.TotalAnimationTime, Move.animationTime);
+				// Segun la Curva de Velocidad
+				if (Move.spaceCurve != null)
+					Move.t = GetTinCurve(Move.spaceCurve, Move.TotalAnimationTime, Move.animationTime);
+				// Velocidad Constante
+				else
+					Move.t = GetTConstantSpeed(Move.TotalAnimationTime, Move.animationTime);
+			}
 
 			MoveInBezier(Move.t);
 		}
@@ -426,6 +438,46 @@ public class Bezier : MonoBehaviour
 		return (float)GetT(espacio);
 	}
 
+	private float GetTinCurve(AnimationCurve spaceCurve, float animationTime, float time, float t0 = 0, float t1 = 1)
+	{
+		// Calculamos la t segun el Espacio en el Grafico de la Curva de Movimiento
+		//if (t0 <= 0 && t1 >= 1)
+		//	return (float)GetT(
+		//		Mathf.Lerp(0, GetLenght(),
+		//			spaceCurve.Evaluate(
+		//				Mathf.InverseLerp(0, animationTime, time)
+		//				)
+		//			)
+		//		);
+
+		// Tiempo de animacion en el tramo
+		float totalAnimationTime = animationTime * (t1 - t0);
+		float timeInSection = time - t0 * animationTime;
+
+		// Punto inicial y final del tramo
+		float s0 = GetDist((decimal)t0);
+		float s1 = GetDist((decimal)t1);
+
+		// Espacio de la Curva [0,1]
+		float espacio = spaceCurve.Evaluate(Mathf.InverseLerp(0, totalAnimationTime, timeInSection)) + s0;
+
+		// Interpolado
+		espacio = Mathf.Lerp(s0, s1, espacio);
+
+		// Vuelve al inicio
+		if (espacio > GetLenght())
+			espacio -= GetLenght();
+		
+		float deltaSpace = espacio - Move.distance;
+		float deltaSpeed = deltaSpace / deltaTime - Move.speed;
+		Move.distance = espacio;
+		Move.speed = deltaSpace / deltaTime;
+		Move.acceleration = deltaSpeed / deltaTime;
+
+		// Espacio normalizado a t (parametro t en la curva con esa longitud con el punto inicial en un margen de error)
+		return (float)GetT(espacio);
+	}
+
 
 	public void SetObjectMoving(GameObject obj) { ObjectMoving = obj; }
 
@@ -536,7 +588,7 @@ public class Bezier : MonoBehaviour
 			UpdateControlPoints();
 
 		// Curve
-		Gizmos.color = Color.yellow;
+		Gizmos.color = Color.blue;
 		decimal t = 0;
 		decimal resolution = 0.01m;
 		if (LUTpuntosT.Count != 0)
@@ -547,7 +599,17 @@ public class Bezier : MonoBehaviour
 
 		// Ray Control Points
 		Gizmos.color = Color.white;
+
+		float tangent1 = (cpPositions[1] - cpPositions[0]).magnitude;
+		float tangent2 = (cpPositions[3] - cpPositions[2]).magnitude;
+
+		float redT = Mathf.InverseLerp(0, GetLenght(), tangent1);
+		Gizmos.color = new Color(redT, 1-redT, 0);
+		
 		Gizmos.DrawLine(cpPositions[0], cpPositions[1]);
+
+		redT = Mathf.InverseLerp(0, GetLenght(), tangent2);
+		Gizmos.color = new Color(redT, 1-redT, 0);
 		Gizmos.DrawLine(cpPositions[2], cpPositions[3]);
 	}
 }
