@@ -308,3 +308,32 @@ Por otra parte la curva tiene un script "Bezier", donde se puede activar o desac
 
 Son prefabs y se pueden reutilizar fácilmente independientemente del objeto al que se los asigne.
 
+
+## PRACTICA 2
+
+He creado 3 Escenas:
+- Una para la curva de Bezier y el moviimiento del avión a través de ella de la Práctica 1
+- Otra para ver las animaciones creadas en esta Práctica 2
+- Y una Escena Principal en la que voy a integrar todas las técnicas en siguientes Prácticas.
+
+### Animaciones
+
+**Andar**:
+
+La traslación no la hace la animación, sino que la controlo a través de un Script en la Escena Principal donde empieza andando hacia delante por 3 segundos antes de lanzar el avión.
+
+**Saltar**:
+
+La he creado de la misma manera que la de Andar, colocando keyframes a mano poco a poco ajustando que quede bien el movimiento. Excepto el movimmiento del modelo vertical, que se aun haciendolo con keyframes he ajustado la velocidad con una curva de forma que no necesita tantos keyframes.
+
+![Curva de Salto](./Curva%20Altura%20del%20Salto.PNG)
+
+![Curvas](./Todas%20las%20curvas%20del%20Salto.PNG)
+
+**Lanzar**:
+
+He hecho una animación para lanzar el avión. Simplemente empieza el brazo en alto y he ido ajustado la rotación del brazo con la curva hasta que me ha gustado el resultado.
+
+### Layers
+
+He utilizado Layers en mi Animation Controller para la Escena Principal, que permiten superponer una animación sobre otra, por medio de una máscara de avatar, en la que bloqueo las piernas para juntar la animación de lanzamiento con la de andar, para poder andar con el avión en la mano antes de lanzarlo.

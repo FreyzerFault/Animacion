@@ -6,6 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/No lo he enchufao.unity
+    guid: 6721fc5131fb82b4eab88673d07be06d
+  - enabled: 1
     path: Assets/Scenes/Bezier.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
+    path: Assets/Scenes/Animation Test.unity
+    guid: 465b672cf36d16f4a95bc30a2dfb449d
   m_configObjects: {}
