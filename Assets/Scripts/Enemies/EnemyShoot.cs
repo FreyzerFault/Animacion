@@ -5,25 +5,33 @@ using UnityEngine;
 public class EnemyShoot : MonoBehaviour
 {
 	public GameObject bulletPrefab;
+	public Vector3 BulletInitialPoint;
+
+	// SHOOTING
 	public float shootFrecuency = 1.5f;
 	public float shootForce = 10;
 	public float rotationSpeed = 0.5f;
 
-	private GameObject target;
+	// TARGET
+	private Vector3 target;
+	private Vector3 targetDir;
+
+	// BULLETS POOLING
 	[SerializeField] private List<GameObject> bulletsPool;
 	private int numBullets;
-
-	private Vector3 BulletInitPosition;
+	
+	void Awake()
+	{
+		target = GameObject.FindGameObjectWithTag("Player").transform.position;
+		target += BulletInitialPoint - transform.position;
+	}
 
 	// Start is called before the first frame update
 	void Start()
 	{
-		target = GameObject.FindGameObjectWithTag("Player");
+		
+		numBullets = (int)Mathf.Round(shootFrecuency * 10);
 
-		BulletInitPosition = transform.position;
-		BulletInitPosition += Vector3.up * 1.5f;
-
-							  numBullets = (int)Mathf.Round(shootFrecuency * 10);
 		for (int i = 0; i < numBullets; i++)
 		{
 			GameObject bullet = Instantiate(bulletPrefab, transform);
@@ -36,7 +44,7 @@ public class EnemyShoot : MonoBehaviour
 
 	void Update()
 	{
-		Vector3 targetDir = (target.transform.position - transform.position).normalized;
+		targetDir = (target - BulletInitialPoint).normalized;
 		transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(targetDir), rotationSpeed * Time.deltaTime);
 	}
 
@@ -58,11 +66,9 @@ public class EnemyShoot : MonoBehaviour
 			if (!rb)
 				print(ToString() + " No tiene RigidBody!!!!");
 
-			Vector3 shootDirection = (target.gameObject.transform.position - transform.position).normalized;
-
-			rb.AddForce(shootDirection * shootForce);
-			bullet.transform.rotation = Quaternion.LookRotation(shootDirection);
-			bullet.transform.position = BulletInitPosition;
+			rb.AddForce(targetDir * shootForce);
+			bullet.transform.rotation = Quaternion.LookRotation(targetDir);
+			bullet.transform.position = BulletInitialPoint;
 
 			Physics.IgnoreCollision(bullet.GetComponent<Collider>(), GetComponent<Collider>());
 		}
@@ -72,11 +78,16 @@ public class EnemyShoot : MonoBehaviour
 	public void DisapearBullet(GameObject bullet)
 	{
 		// Mover de la Pool a la lista de activos
-		bullet.transform.position = transform.position;
+		bullet.transform.position = BulletInitialPoint;
 		bullet.GetComponent<Rigidbody>().velocity = Vector3.zero;
 		bullet.SetActive(false);
 		bulletsPool.Add(bullet);
 
 		numBullets++;
+	}
+
+	void OnDrawGizmos()
+	{
+		Gizmos.DrawLine(BulletInitialPoint, GameObject.FindGameObjectWithTag("Player").transform.position);
 	}
 }
