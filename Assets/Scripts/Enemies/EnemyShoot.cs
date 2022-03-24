@@ -64,7 +64,7 @@ public class EnemyShoot : MonoBehaviour
 			bullet.transform.rotation = Quaternion.LookRotation(shootDirection);
 			bullet.transform.position = BulletInitPosition;
 
-			//Physics.IgnoreCollision(bullet.GetComponent<Collider>(), GetComponent<Collider>());
+			Physics.IgnoreCollision(bullet.GetComponent<Collider>(), GetComponent<Collider>());
 		}
 	}
 
