@@ -58,12 +58,14 @@ public class Bezier : MonoBehaviour
 
 		[Space]
 		[Header("Parameters:")]
-		[SerializeField] public float t;
-		[SerializeField][InspectorName("Distance")] public float distance;
-		[SerializeField] public float animationTime;
-		[SerializeField] public float speed;
-		[SerializeField] public float acceleration;
-		[SerializeField] public float tiempoNormalizado;
+		public float AnimationTime;
+		public float TiempoNormalizado;
+		public float T;
+		public float Distance;
+		[Range(0, 100)] public float Speed;
+		public float Acceleration;
+
+		public AnimationCurve tCurve;
 	}
 
 	[Space]
@@ -108,7 +110,7 @@ public class Bezier : MonoBehaviour
 				ResetToInit();
 
 			// Tiempo que lleva en una de las secciones de la curva para hacer ease In / Out
-			Move.animationTime += deltaTime;
+			Move.AnimationTime += deltaTime;
 
 			// Chekea que sean coherentes
 			if (Move.EaseInSection + Move.EaseOutSection > 1)
@@ -120,19 +122,19 @@ public class Bezier : MonoBehaviour
 			}
 
 			if (easeInOutActivated())
-				Move.t = GetTeaseInOut(Move.TotalAnimationTime, Move.EaseInSection, 1 - Move.EaseOutSection, Move.animationTime);
+				Move.T = GetTeaseInOut(Move.TotalAnimationTime, Move.EaseInSection, 1 - Move.EaseOutSection, Move.AnimationTime);
 			else
 			{	// Sin Ease In Ease Out
 
 				// Segun la Curva de Velocidad
 				if (Move.spaceCurve != null)
-					Move.t = GetTinCurve(Move.spaceCurve, Move.TotalAnimationTime, Move.animationTime);
+					Move.T = GetTinCurve(Move.spaceCurve, Move.TotalAnimationTime, Move.AnimationTime);
 				// Velocidad Constante
 				else
-					Move.t = GetTConstantSpeed(Move.TotalAnimationTime, Move.animationTime);
+					Move.T = GetTConstantSpeed(Move.TotalAnimationTime, Move.AnimationTime);
 			}
 
-			MoveInBezier(Move.t);
+			MoveInBezier(Move.T);
 		}
 		
 	}
@@ -382,22 +384,22 @@ public class Bezier : MonoBehaviour
 		if (timeNormalized > t2)
 			d = v0 * t1 / 2 + v0 * (t2 - t1) + (v0 - (v0 * (timeNormalized - t2) / (1 - t2)) / 2) * (timeNormalized - t2);
 
-		Move.tiempoNormalizado = timeNormalized;
-		Move.distance = d;
+		Move.TiempoNormalizado = timeNormalized;
+		Move.Distance = d;
 		if (timeNormalized < t1)
 		{
-			Move.acceleration = v0 / t1;
-			Move.speed = v0 * timeNormalized / t1;
+			Move.Acceleration = v0 / t1;
+			Move.Speed = v0 * timeNormalized / t1;
 		}
-		if (timeNormalized >= t1 && Move.tiempoNormalizado <= t2)
+		if (timeNormalized >= t1 && Move.TiempoNormalizado <= t2)
 		{
-			Move.acceleration = 0;
-			Move.speed = v0;
+			Move.Acceleration = 0;
+			Move.Speed = v0;
 		}
 		if (timeNormalized > t2)
 		{
-			Move.acceleration = -v0 / (1 - t2);
-			Move.speed = v0 * (1 - (timeNormalized - t2) / (1 - t2));
+			Move.Acceleration = -v0 / (1 - t2);
+			Move.Speed = v0 * (1 - (timeNormalized - t2) / (1 - t2));
 		}
 
 		// Interpolacion lineal de [0,1] a [0, distancia total de la curva]
@@ -422,17 +424,17 @@ public class Bezier : MonoBehaviour
 
 		float speed = (s1 - s0) / easeAnimationTime;
 
-		float espacio = (Move.speed * timeInSection) + s0;
+		float espacio = (Move.Speed * timeInSection) + s0;
 
 		// Vuelve al inicio
 		if (espacio > GetLenght())
 			espacio -= GetLenght();
 
 
-		Move.speed = speed;
-		Move.acceleration = 0;
-		Move.distance = espacio;
-		Move.animationTime = timeInSection;
+		Move.Speed = speed;
+		Move.Acceleration = 0;
+		Move.Distance = espacio;
+		Move.AnimationTime = timeInSection;
 
 		// Espacio normalizado a t (parametro t en la curva con esa longitud con el punto inicial en un margen de error)
 		return (float)GetT(espacio);
@@ -440,42 +442,47 @@ public class Bezier : MonoBehaviour
 
 	private float GetTinCurve(AnimationCurve spaceCurve, float animationTime, float time, float t0 = 0, float t1 = 1)
 	{
+		float espacio = 0;
 		// Calculamos la t segun el Espacio en el Grafico de la Curva de Movimiento
-		//if (t0 <= 0 && t1 >= 1)
-		//	return (float)GetT(
-		//		Mathf.Lerp(0, GetLenght(),
-		//			spaceCurve.Evaluate(
-		//				Mathf.InverseLerp(0, animationTime, time)
-		//				)
-		//			)
-		//		);
+		if (t0 <= 0 && t1 >= 1)
+			espacio = Mathf.Lerp(0, GetLenght(),
+				spaceCurve.Evaluate(
+					Mathf.InverseLerp(0, animationTime, time)
+				)
+			);
+		else
+		{
+			// Tiempo de animacion en el tramo
+			float totalAnimationTime = animationTime * (t1 - t0);
+			float timeInSection = time - t0 * animationTime;
 
-		// Tiempo de animacion en el tramo
-		float totalAnimationTime = animationTime * (t1 - t0);
-		float timeInSection = time - t0 * animationTime;
+			// Punto inicial y final del tramo
+			float s0 = GetDist((decimal)t0);
+			float s1 = GetDist((decimal)t1);
 
-		// Punto inicial y final del tramo
-		float s0 = GetDist((decimal)t0);
-		float s1 = GetDist((decimal)t1);
+			// Espacio de la Curva [0,1]
+			espacio = spaceCurve.Evaluate(Mathf.InverseLerp(0, totalAnimationTime, timeInSection)) + s0;
 
-		// Espacio de la Curva [0,1]
-		float espacio = spaceCurve.Evaluate(Mathf.InverseLerp(0, totalAnimationTime, timeInSection)) + s0;
-
-		// Interpolado
-		espacio = Mathf.Lerp(s0, s1, espacio);
+			// Interpolado
+			espacio = Mathf.Lerp(s0, s1, espacio);
+		}
 
 		// Vuelve al inicio
 		if (espacio > GetLenght())
 			espacio -= GetLenght();
-		
-		float deltaSpace = espacio - Move.distance;
-		float deltaSpeed = deltaSpace / deltaTime - Move.speed;
-		Move.distance = espacio;
-		Move.speed = deltaSpace / deltaTime;
-		Move.acceleration = deltaSpeed / deltaTime;
+
+		float t = (float)GetT(espacio);
+
+		Move.tCurve.AddKey(time, t);
+
+		float deltaSpace = espacio - Move.Distance;
+		float deltaSpeed = deltaSpace / deltaTime - Move.Speed;
+		Move.Distance = espacio;
+		Move.Speed = deltaSpace / deltaTime;
+		Move.Acceleration = deltaSpeed / deltaTime;
 
 		// Espacio normalizado a t (parametro t en la curva con esa longitud con el punto inicial en un margen de error)
-		return (float)GetT(espacio);
+		return t;
 	}
 
 
@@ -517,7 +524,7 @@ public class Bezier : MonoBehaviour
 	}
 
 	// Ha acabado el tiempo de Animacion
-	public bool AnimationFinished() { return Move.animationTime >= Move.TotalAnimationTime; }
+	public bool AnimationFinished() { return Move.AnimationTime >= Move.TotalAnimationTime; }
 
 
 	private void ResetToInit()
@@ -526,7 +533,7 @@ public class Bezier : MonoBehaviour
 			ObjectMoving.transform.rotation = RotateTowardsCurve(0);
 
 		// Variables dependientes de la posicion de la curva reseteadas
-		Move.animationTime = 0;
+		Move.AnimationTime = 0;
 	}
 
 	private void MoveInBezier(float t)
