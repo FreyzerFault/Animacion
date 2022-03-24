@@ -1169,7 +1169,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7971447488086287295, guid: 53db5cac8ea9d3d48882b52d8987f704, type: 3}
       propertyPath: m_Name
-      value: Spawner Box
+      value: Obstacle Spawner
       objectReference: {fileID: 0}
     - target: {fileID: 7971447488086287295, guid: 53db5cac8ea9d3d48882b52d8987f704, type: 3}
       propertyPath: m_Layer
@@ -1205,7 +1205,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8474718356949527913, guid: 53db5cac8ea9d3d48882b52d8987f704, type: 3}
       propertyPath: m_IsTrigger
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 53db5cac8ea9d3d48882b52d8987f704, type: 3}
@@ -1935,7 +1935,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7971447488086287295, guid: 53db5cac8ea9d3d48882b52d8987f704, type: 3}
       propertyPath: m_Name
-      value: Spawner Box (1)
+      value: Enemy Spawner
       objectReference: {fileID: 0}
     - target: {fileID: 7971447488086287295, guid: 53db5cac8ea9d3d48882b52d8987f704, type: 3}
       propertyPath: m_Layer
@@ -1967,7 +1967,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8474718356949527913, guid: 53db5cac8ea9d3d48882b52d8987f704, type: 3}
       propertyPath: m_IsTrigger
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 53db5cac8ea9d3d48882b52d8987f704, type: 3}
