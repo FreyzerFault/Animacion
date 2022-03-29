@@ -12,6 +12,7 @@ TagManager:
   - TimeText
   - Region
   - Spawner
+  - Health
   layers:
   - Default
   - TransparentFX

@@ -5,7 +5,7 @@ using UnityEngine;
 public class EnemyShoot : MonoBehaviour
 {
 	public GameObject bulletPrefab;
-	public Vector3 BulletInitialPoint;
+	public Transform BulletInitialPoint;
 
 	// SHOOTING
 	public float shootFrecuency = 1.5f;
@@ -13,7 +13,7 @@ public class EnemyShoot : MonoBehaviour
 	public float rotationSpeed = 0.5f;
 
 	// TARGET
-	private Vector3 target;
+	private Transform target;
 	private Vector3 targetDir;
 
 	// BULLETS POOLING
@@ -22,8 +22,7 @@ public class EnemyShoot : MonoBehaviour
 	
 	void Awake()
 	{
-		target = GameObject.FindGameObjectWithTag("Player").transform.position;
-		target += BulletInitialPoint - transform.position;
+		target = GameObject.FindGameObjectWithTag("Player").transform;
 	}
 
 	// Start is called before the first frame update
@@ -44,7 +43,7 @@ public class EnemyShoot : MonoBehaviour
 
 	void Update()
 	{
-		targetDir = (target - BulletInitialPoint).normalized;
+		targetDir = (target.position - BulletInitialPoint.position).normalized;
 		transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(targetDir), rotationSpeed * Time.deltaTime);
 	}
 
@@ -68,7 +67,7 @@ public class EnemyShoot : MonoBehaviour
 
 			rb.AddForce(targetDir * shootForce);
 			bullet.transform.rotation = Quaternion.LookRotation(targetDir);
-			bullet.transform.position = BulletInitialPoint;
+			bullet.transform.position = BulletInitialPoint.position;
 
 			Physics.IgnoreCollision(bullet.GetComponent<Collider>(), GetComponent<Collider>());
 		}
@@ -78,7 +77,7 @@ public class EnemyShoot : MonoBehaviour
 	public void DisapearBullet(GameObject bullet)
 	{
 		// Mover de la Pool a la lista de activos
-		bullet.transform.position = BulletInitialPoint;
+		bullet.transform.position = BulletInitialPoint.position;
 		bullet.GetComponent<Rigidbody>().velocity = Vector3.zero;
 		bullet.SetActive(false);
 		bulletsPool.Add(bullet);
@@ -88,6 +87,6 @@ public class EnemyShoot : MonoBehaviour
 
 	void OnDrawGizmos()
 	{
-		Gizmos.DrawLine(BulletInitialPoint, GameObject.FindGameObjectWithTag("Player").transform.position);
+		Gizmos.DrawLine(BulletInitialPoint.position, GameObject.FindGameObjectWithTag("Player").transform.position);
 	}
 }
