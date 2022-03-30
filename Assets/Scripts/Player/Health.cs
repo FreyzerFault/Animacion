@@ -16,6 +16,9 @@ public class Health : MonoBehaviour
 
 	[SerializeField] private float health;
 
+	private float maxBarWidth = -1;
+	private Vector3 iconScale;
+
 	// Start is called before the first frame update
 	void Start()
 	{
@@ -29,7 +32,8 @@ public class Health : MonoBehaviour
 
 		health = MaxHealth;
 
-		UpdateHealthBar();
+		iconScale = icon.transform.localScale;
+		maxBarWidth = greenBar.rectTransform.rect.width;
 	}
 
 	// Update is called once per frame
@@ -49,13 +53,14 @@ public class Health : MonoBehaviour
 			if (!alerta)
 				print(ToString() + " NO ENCONTRO EL GameObject con TAG = 'Alerta'");
 
-			StartCoroutine(alerta.ShowMessage("YOU LOSE", 3, true));
+			StartCoroutine(alerta.ShowMessage("YOU LOSE", 5, true));
 		}
-
-		UpdateHealthBar();
+		else
+			StartCoroutine(UpdateHealthBar());
 	}
 
-	public void UpdateHealthBar()
+
+	public IEnumerator UpdateHealthBar()
 	{
 		// Change Color
 		float t = Mathf.InverseLerp(0, MaxHealth, health);
@@ -67,6 +72,20 @@ public class Health : MonoBehaviour
 		greenBar.color = green;
 
 		// Shrink Bar
-		//greenBar.rectTransform.
+		Rect rect = greenBar.rectTransform.rect;
+
+		greenBar.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, maxBarWidth * t);
+		redBar.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, maxBarWidth * t);
+
+		// Shake Icon
+		float iconRotation = ((Random.value - 0.5f) * 2) * 20;
+
+		icon.transform.Rotate(Vector3.forward, iconRotation);
+		icon.transform.localScale *= Random.value / 2 + 1;
+
+		yield return new WaitForSeconds(.1f);
+
+		icon.transform.localScale = iconScale;
+		icon.transform.Rotate(Vector3.forward, -iconRotation);
 	}
 }
