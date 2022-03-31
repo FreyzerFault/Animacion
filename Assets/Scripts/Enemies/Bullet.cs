@@ -1,40 +1,47 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class Bullet : MonoBehaviour
+public class Bullet : Spawneable
 {
 	public float MaxTimeAlive = 2;
 	public float damage = 5;
 	private float timeAlive = 0;
 
-	// Start is called before the first frame update
-	void Start()
+	void Awake()
 	{
+		base.Awake();
+
+		Physics.IgnoreCollision(GetComponent<Collider>(), spawner.GetComponentInParent<CapsuleCollider>());
 	}
 
-	void Update()
+	void FixedUpdate()
 	{
-		timeAlive += Time.deltaTime;
+		timeAlive += Time.fixedDeltaTime;
 
 		if (timeAlive > MaxTimeAlive)
-			Disappear();
+			Destroy();
 	}
 
 	// Update is called once per frame
 	void OnTriggerEnter(Collider other)
 	{
-		Disappear();
+		Destroy();
 
-		if (other.GetComponent<Collider>() == GameObject.FindGameObjectWithTag("Player").GetComponent<Collider>())
+		// Hit Player
+		if (other.gameObject.tag == "Player")
 		{
 			other.GetComponent<Health>().doDamage(damage);
 		}
 	}
 
-	void Disappear()
+	public override void OnEnable()
 	{
-		GetComponentInParent<EnemyShoot>().DisapearBullet(this.gameObject);
+		timeAlive = 0;
+	}
+
+	public override void OnDisable()
+	{
+		StopAllCoroutines();
 		timeAlive = 0;
 	}
 }

@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class GiroPermanente : MonoBehaviour
+public class GiroPermanente : Spawneable
 {
 	public float bounceForce;
 	public float rotationSpeed;
@@ -16,15 +16,9 @@ public class GiroPermanente : MonoBehaviour
 	private GameObject player;
 	private Rigidbody m_PlayerBody;
 
-	// Start is called before the first frame update
-	void Awake()
+	public override void OnEnable()
 	{
-		if (GameObject.FindGameObjectsWithTag("Player").Length <= 0)
-		{
-			Debug.LogWarning("No existe ningun objecto con la Tag 'Player'");
-			return;
-		}
-		player = GameObject.FindGameObjectWithTag("Player");
+		player = GameController.Player;
 		m_PlayerBody = player.GetComponent<Rigidbody>();
 
 		// Random rotation [-10,10] + rotaticion ( y la direccion de la rotacion es aleatoria
@@ -35,7 +29,11 @@ public class GiroPermanente : MonoBehaviour
 
 			rotationSpeed = rotationSpeed + Random.Range(-10, 10);
 		}
-			
+	}
+
+	public override void OnDisable()
+	{
+		return;
 	}
 
 	// Update is called once per frame
@@ -70,7 +68,6 @@ public class GiroPermanente : MonoBehaviour
 
 	void BounceBack()
 	{
-		print("Bounce Back");
 		m_PlayerBody.AddForce(-m_Collision.contacts[0].normal * bounceForce);
 	}
 
