@@ -39,14 +39,12 @@ public class PauseMenu : SingletonPersistent<PauseMenu>
 		buttonPanel.SetActive(m_Paused);
 	}
 
-
-#if !MOBILE_INPUT
+	
 	void Update()
 	{
 		if(Input.GetKeyUp(KeyCode.Escape))
 			m_MenuToggle.isOn = !m_MenuToggle.isOn;
 	}
-#endif
 
 	public void Pause( bool pause = true )
 	{

@@ -2,7 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Pooling : MonoBehaviour
+// Utiliza POOLING
+// Spawnea objetos en la posicion dada
+
+public class Spawner : MonoBehaviour
 {
 	public GameObject ObjectPrefab;
 
@@ -56,7 +59,10 @@ public abstract class Pooling : MonoBehaviour
 	}
 
 	// Spawnea el objeto sacandolo de la Pool
-	public virtual GameObject Spawn(Vector3? position = null, Quaternion? rotation = null)
+	public virtual GameObject Spawn(
+		Vector3? position = null,
+		Quaternion? rotation = null
+		)
 	{
 		// Si esta vacio creamos otro
 		if (pool.Count == 0)

@@ -16,11 +16,8 @@ public class GiroPermanente : Spawneable
 	private GameObject player;
 	private Rigidbody m_PlayerBody;
 
-	public override void OnEnable()
+	protected override void OnEnable()
 	{
-		player = GameManager.Player;
-		m_PlayerBody = player.GetComponent<Rigidbody>();
-
 		// Random rotation [-10,10] + rotaticion ( y la direccion de la rotacion es aleatoria
 		if (randomRotation)
 		{
@@ -29,11 +26,6 @@ public class GiroPermanente : Spawneable
 
 			rotationSpeed = rotationSpeed + Random.Range(-10, 10);
 		}
-	}
-
-	public override void OnDisable()
-	{
-		return;
 	}
 
 	// Update is called once per frame
@@ -53,10 +45,14 @@ public class GiroPermanente : Spawneable
 	void OnCollisionEnter(Collision collision)
 	{
 		m_Collision = collision;
+
+		// Player Collider
+		player = GameManager.Player;
+		m_PlayerBody = player.GetComponent<Rigidbody>();
+
 		// Bounce back
 		if (collision.body == m_PlayerBody && !bouncing)
 		{
-			print("Collision with player");
 			Vector3 up = Vector3.up;
 			m_PlayerBody.velocity = Vector3.zero;
 			m_PlayerBody.AddForce((up - m_Collision.contacts[0].normal) * bounceForce);

@@ -16,6 +16,9 @@ public class Bullet : Spawneable
 
 		if (GetComponent<Collider>() && spawner.GetComponentInParent<CapsuleCollider>())
 			Physics.IgnoreCollision(GetComponent<Collider>(), spawner.GetComponentInParent<CapsuleCollider>());
+
+		Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Bullet"), LayerMask.NameToLayer("Bullet"));
+		Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Bullet"), LayerMask.NameToLayer("Spawner"));
 	}
 
 	void FixedUpdate()
@@ -27,8 +30,7 @@ public class Bullet : Spawneable
 			Destroy();
 		}
 	}
-
-	// Update is called once per frame
+	
 	void OnTriggerEnter(Collider other)
 	{
 		StartCoroutine(Hit());
@@ -40,24 +42,16 @@ public class Bullet : Spawneable
 		}
 	}
 
-	public override void OnEnable()
+	protected override void OnEnable()
 	{
 		timeAlive = 0;
 		ShootEffects();
 	}
 
-	public override void OnDisable()
+	protected override void OnDisable()
 	{
 		StopAllCoroutines();
 		timeAlive = 0;
-	}
-
-	public override void Destroy()
-	{
-		base.Destroy();
-
-		if (GetComponent<Rigidbody>())
-			GetComponent<Rigidbody>().velocity = Vector3.zero;
 	}
 
 	private void ShootEffects()
@@ -71,7 +65,9 @@ public class Bullet : Spawneable
 
 	private IEnumerator Hit()
 	{
-		//HitParticles = GetComponentInChildren<ParticleSystem>();
+		// Activa los efectos y esconde la bala
+		GetComponent<MeshRenderer>().enabled = false;
+
 		if (HitParticles)
 			HitParticles.Play();
 		
@@ -80,6 +76,16 @@ public class Bullet : Spawneable
 
 		yield return new WaitForSeconds(.3f);
 
+		GetComponent<MeshRenderer>().enabled = true;
+
 		Destroy();
+	}
+
+	public override void Destroy()
+	{
+		base.Destroy();
+
+		if (GetComponent<Rigidbody>())
+			GetComponent<Rigidbody>().velocity = Vector3.zero;
 	}
 }

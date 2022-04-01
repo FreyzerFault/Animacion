@@ -6,8 +6,8 @@ public class SceneController : SingletonPersistent<SceneController>
 	// Modo de Juego Inicial de cada Escena
 	private static Dictionary<int, GameMode> SceneInitGameMode = new Dictionary<int, GameMode>()
 	{
-		{0, GameMode.Default },
-		{1, GameMode.FirstPerson },
+		{0, GameMode.FirstPerson },
+		{1, GameMode.Default },
 		{2, GameMode.Default },
 		{3, GameMode.Default },
 	};

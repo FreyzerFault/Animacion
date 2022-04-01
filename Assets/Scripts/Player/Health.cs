@@ -48,9 +48,9 @@ public class Health : MonoBehaviour
 
 				StartCoroutine(alerta.ShowMessage("YOU LOSE", 5, true));
 			}
-			else if (GetComponent<EnemyShoot>())
+			else if (GetComponent<Enemy>())
 			{
-				StartCoroutine(GetComponent<EnemyShoot>().Death());
+				StartCoroutine(GetComponent<Enemy>().Death());
 			}
 		}
 	}

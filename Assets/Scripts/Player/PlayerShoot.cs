@@ -1,14 +1,11 @@
 using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 public class PlayerShoot : MonoBehaviour
 {
-	public Gun gun;
-
 	public Transform shootOrigin;
+	public Transform gunCannon;
 	public float maxShootDistance = 100;
 
 	public float damage = 20;
@@ -18,28 +15,21 @@ public class PlayerShoot : MonoBehaviour
 
 	public AudioSource shootSound;
 	public AudioSource hitSound;
-
-	// Start is called before the first frame update
-	void Start()
-	{
-		if (gun == null)
-			gun = GetComponent<Gun>();
-	}
-
-	// Update is called once per frame
+	
 	void Update()
 	{
 		if (Input.GetMouseButtonDown((int)MouseButton.LeftMouse))
 		{
-			//gun.Shoot(GameManager.MainCamera.transform.forward * gun.ShootForce);
-
 			Shoot();
 
 			// Raycasting
 			Ray shootRay = new Ray(shootOrigin.position, shootOrigin.forward);
 			
 			// No se comprueba directamente si es de enemigo porque podria atravesar algo entre medias
-			RaycastHit[] hits = Physics.RaycastAll(shootRay, maxShootDistance, LayerMask.GetMask("Enemy", "Default"));
+			RaycastHit[] hits = Physics.RaycastAll(
+				shootRay, maxShootDistance,
+				LayerMask.GetMask("Enemy", "Default")
+				);
 
 			if (hits.Length != 0)
 			{
@@ -98,7 +88,7 @@ public class PlayerShoot : MonoBehaviour
 	void Shoot()
 	{
 		
-		shootParticles.transform.SetPositionAndRotation(gun.spawnPoint.transform.position, gun.spawnPoint.transform.rotation);
+		shootParticles.transform.SetPositionAndRotation(gunCannon.position, gunCannon.rotation);
 		shootParticles.Play();
 
 		shootSound.Play();

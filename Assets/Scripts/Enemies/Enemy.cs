@@ -1,7 +1,8 @@
 using System.Collections;
+using UnityEditor;
 using UnityEngine;
 
-public class EnemyShoot : Spawneable
+public class Enemy : Spawneable
 {
 	// SHOOTING
 	public Gun gun;
@@ -11,7 +12,7 @@ public class EnemyShoot : Spawneable
 	public float rotationSpeed = 0.5f;
 
 	// TARGET
-	private Transform target => GameManager.Player.transform;
+	private Transform target;
 	private Vector3 targetDir;
 
 	public ParticleSystem DeathParticles;
@@ -19,22 +20,23 @@ public class EnemyShoot : Spawneable
 	protected override void Awake()
 	{
 		base.Awake();
-
+		
 		gun = GetComponent<Gun>();
 	}
 
 	void Update()
 	{
+		target = GameManager.Player.transform;
 		targetDir = (target.position - gun.GetSpawnPoint()).normalized;
 		transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(targetDir), rotationSpeed * Time.deltaTime);
 	}
-
+	
 	void OnDrawGizmos()
 	{
 		Gizmos.DrawLine(gun.GetSpawnPoint(), target.position);
 	}
 
-	public override void OnEnable()
+	protected override void OnEnable()
 	{
 		// Inicia el Spawner de balas segun la frecuencia
 		int initNumBullets = (int)Mathf.Round(shootFrecuency * 10);
@@ -44,12 +46,14 @@ public class EnemyShoot : Spawneable
 		StartCoroutine(ShootRoutine());
 	}
 
-	public override void OnDisable()
+	protected override void OnDisable()
 	{
 		StopAllCoroutines();
 
 		// Destruye las balas que tenga
 		gun.Clear();
+
+		base.OnDisable();
 	}
 
 

@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class Gun : Pooling
+public class Gun : Spawner
 {
 	public float ShootForce = 20f;
 
@@ -19,10 +19,6 @@ public class Gun : Pooling
 			Physics.IgnoreCollision(GetComponent<Collider>(), ObjectPrefab.GetComponent<Collider>());
 
 		base.Awake();
-	}
-	
-	void Update()
-	{
 	}
 
 	// Spawnea el objeto disparandolo con una fuerza, orientado o no en la direccion de la fuerza

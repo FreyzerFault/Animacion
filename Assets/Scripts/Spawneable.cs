@@ -6,17 +6,20 @@ using UnityEngine;
 
 public abstract class Spawneable : MonoBehaviour
 {
-	protected Pooling spawner;
+	protected Spawner spawner;
 
 	protected virtual void Awake()
 	{
-		if (GetComponentInParent<Pooling>())
-			spawner = GetComponentInParent<Pooling>();
+		if (GetComponentInParent<Spawner>())
+			spawner = GetComponentInParent<Spawner>();
 	}
 
-	public abstract void OnEnable();
+	protected abstract void OnEnable();
 
-	public abstract void OnDisable();
+	protected virtual void OnDisable()
+	{
+		Destroy();
+	}
 
 	// Cuando se destruye el objeto se devuelve a la pool
 	public virtual void Destroy()

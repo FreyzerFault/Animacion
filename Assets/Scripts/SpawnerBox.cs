@@ -1,11 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// Caja de Colision que solo sirve para definir una region con su Caja
-// Spawnea objetos en esa region
+// U
 
 [RequireComponent(typeof(BoxCollider))]
-public class SpawnerBox : Pooling
+public class SpawnerBox : Spawner
 {
 	public bool instantSpawn = false;
 
@@ -49,7 +48,12 @@ public class SpawnerBox : Pooling
 		if (ignoreHeight)
 			maxPosition.y = minPosition.y;
 
-		return Spawn(GetRandomPos(minPosition, maxPosition), randomRotation ? GetRandomRot() : (Quaternion?)null);
+		return Spawn(
+			GetRandomPos(minPosition, maxPosition),
+			randomRotation
+				? GetRandomRot()
+				: (Quaternion?)null
+			);
 	}
 
 	// Spawnea el objeto sacandolo de la Pool
@@ -59,7 +63,7 @@ public class SpawnerBox : Pooling
 		GameObject obj = base.Spawn(position ?? getCenter(), rotation);
 
 		// Ignora colisiones entre el item y la caja del Spawner
-		Physics.IgnoreCollision(obj.GetComponent<Collider>(), GetComponent<Collider>());
+		Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Spawner"), 0);
 
 		return obj;
 	}

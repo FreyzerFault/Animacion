@@ -128,10 +128,10 @@ public class GameManager : Singleton<GameManager>
 		Application.Quit();
 	}
 
-	void Start()
+	protected override void Awake()
 	{
+		base.Awake();
 	}
-
 
 	void Update()
 	{
@@ -147,16 +147,16 @@ public class GameManager : Singleton<GameManager>
 				};
 			}
 
-			//if (Mode == GameMode.ThirdPerson)
-			//	FirstPersonChar.transform.SetPositionAndRotation(
-			//		ThirdPersonChar.transform.position,
-			//		ThirdPersonChar.transform.rotation
-			//		);
-			//else if (Mode == GameMode.FirstPerson)
-			//	ThirdPersonChar.transform.SetPositionAndRotation(
-			//		FirstPersonChar.transform.position,
-			//		FirstPersonChar.transform.rotation
-			//	);
+			if (Mode == GameMode.ThirdPerson)
+				FirstPersonChar.transform.SetPositionAndRotation(
+					ThirdPersonChar.transform.position,
+					ThirdPersonChar.transform.rotation
+					);
+			else if (Mode == GameMode.FirstPerson)
+				ThirdPersonChar.transform.SetPositionAndRotation(
+					FirstPersonChar.transform.position,
+					FirstPersonChar.transform.rotation
+				);
 		}
 	}
 }
