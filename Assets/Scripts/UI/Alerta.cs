@@ -1,7 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class Alerta : MonoBehaviour
@@ -17,33 +15,22 @@ public class Alerta : MonoBehaviour
 
 	public IEnumerator ShowMessage(string msg, float seconds, bool resetGame = false)
 	{
-		if (resetGame)
-			Time.timeScale = .5f;
 
 		text.text = msg;
 		text.enabled = true;
 
 		if (resetGame)
-		{
-			const float increment = .1f;
-			for (float i = seconds; i > 0; i -= increment)
-			{
-				yield return new WaitForSecondsRealtime(increment);
-
-				Time.timeScale = Mathf.InverseLerp(0, seconds, i / 2);
-			}
-		}
+			yield return SlowMo.slowMoPogressive(seconds);
 		else
-		{
 			yield return new WaitForSeconds(seconds);
-		}
 
 		text.enabled = false;
 
 		if (resetGame)
 		{
-			SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-			Time.timeScale = 1;
+			SceneController.ReloadScene();
 		}
 	}
+
+	
 }

@@ -18,8 +18,11 @@ public class Health : MonoBehaviour
 	{
 		health = MaxHealth;
 
-		healthBar.SetMaxHealth(MaxHealth);
-		healthBar.SetHealth(health);
+		if (healthBar != null)
+		{
+			healthBar.SetMaxHealth(MaxHealth);
+			healthBar.SetHealth(health);
+		}
 	}
 
 	public void doDamage(float dmg)
@@ -36,12 +39,19 @@ public class Health : MonoBehaviour
 
 		if (health <= 0)
 		{
-			GameObject alertaObj = GameObject.FindGameObjectWithTag("Alerta");
-			Alerta alerta = alertaObj.GetComponent<Alerta>();
-			if (!alerta)
-				print(ToString() + " NO ENCONTRO EL GameObject con TAG = 'Alerta'");
+			if (gameObject.tag == "Player")
+			{
+				GameObject alertaObj = GameObject.FindGameObjectWithTag("Alerta");
+				Alerta alerta = alertaObj.GetComponent<Alerta>();
+				if (!alerta)
+					print(ToString() + " NO ENCONTRO EL GameObject con TAG = 'Alerta'");
 
-			StartCoroutine(alerta.ShowMessage("YOU LOSE", 5, true));
+				StartCoroutine(alerta.ShowMessage("YOU LOSE", 5, true));
+			}
+			else if (GetComponent<EnemyShoot>())
+			{
+				StartCoroutine(GetComponent<EnemyShoot>().Death());
+			}
 		}
 	}
 }

@@ -4,37 +4,34 @@ using UnityEngine;
 public class EnemyShoot : Spawneable
 {
 	// SHOOTING
-	public SpawnerBox bulletSpawner => GetComponentInChildren<SpawnerBox>();
+	public Gun gun;
 	public float shootFrecuency = 1.5f;
-	public float shootForce = 10;
 
 	// MOVEMENT
 	public float rotationSpeed = 0.5f;
 
 	// TARGET
-	private Transform target => GameController.Player.transform;
+	private Transform target => GameManager.Player.transform;
 	private Vector3 targetDir;
+
+	public ParticleSystem DeathParticles;
+
+	protected override void Awake()
+	{
+		base.Awake();
+
+		gun = GetComponent<Gun>();
+	}
 
 	void Update()
 	{
-		targetDir = (target.position - bulletSpawner.getCenter()).normalized;
+		targetDir = (target.position - gun.GetSpawnPoint()).normalized;
 		transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(targetDir), rotationSpeed * Time.deltaTime);
-	}
-
-	// Dispara una bala con una frecuencia
-	IEnumerator ShootRoutine()
-	{
-		while (true)
-		{
-			yield return new WaitForSeconds(1 / shootFrecuency + Random.value);
-
-			GameObject bullet = bulletSpawner.Shoot(targetDir * shootForce);
-		}
 	}
 
 	void OnDrawGizmos()
 	{
-		Gizmos.DrawLine(bulletSpawner.getCenter(), target.position);
+		Gizmos.DrawLine(gun.GetSpawnPoint(), target.position);
 	}
 
 	public override void OnEnable()
@@ -42,7 +39,7 @@ public class EnemyShoot : Spawneable
 		// Inicia el Spawner de balas segun la frecuencia
 		int initNumBullets = (int)Mathf.Round(shootFrecuency * 10);
 
-		bulletSpawner.LoadPool(initNumBullets);
+		gun.LoadPool(initNumBullets);
 
 		StartCoroutine(ShootRoutine());
 	}
@@ -52,6 +49,42 @@ public class EnemyShoot : Spawneable
 		StopAllCoroutines();
 
 		// Destruye las balas que tenga
-		bulletSpawner.Clear();
+		gun.Clear();
+	}
+
+
+	// Dispara una bala con una frecuencia
+	IEnumerator ShootRoutine()
+	{
+		while (true)
+		{
+			yield return new WaitForSeconds(1 / shootFrecuency + Random.value);
+
+			GameObject bullet = gun.Shoot(targetDir * gun.ShootForce);
+		}
+	}
+
+	public IEnumerator Death()
+	{
+		// Hide y Disable Collider
+		foreach (SkinnedMeshRenderer child in GetComponentsInChildren<SkinnedMeshRenderer>())
+		{
+			child.gameObject.SetActive(false);
+		}
+
+		GetComponent<Collider>().enabled = false;
+
+		// Play Death Animation
+		DeathParticles.Play();
+
+		yield return new WaitForSeconds(.3f);
+
+		foreach (SkinnedMeshRenderer child in GetComponentsInChildren<SkinnedMeshRenderer>())
+		{
+			child.gameObject.SetActive(true);
+		}
+		GetComponent<Collider>().enabled = true;
+
+		base.Destroy();
 	}
 }

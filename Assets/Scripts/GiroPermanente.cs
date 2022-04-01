@@ -18,7 +18,7 @@ public class GiroPermanente : Spawneable
 
 	public override void OnEnable()
 	{
-		player = GameController.Player;
+		player = GameManager.Player;
 		m_PlayerBody = player.GetComponent<Rigidbody>();
 
 		// Random rotation [-10,10] + rotaticion ( y la direccion de la rotacion es aleatoria

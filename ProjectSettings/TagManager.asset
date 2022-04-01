@@ -20,7 +20,11 @@ TagManager:
   - 
   - Water
   - UI
-  - SpawnerRegion
+  - 
+  - 
+  - 
+  - 
+  - Enemy
   - 
   - 
   - 
@@ -35,11 +39,7 @@ TagManager:
   - 
   - 
   - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Spawner
   - 
   - 
   - 
