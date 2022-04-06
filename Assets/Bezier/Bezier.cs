@@ -490,6 +490,8 @@ public class Bezier : MonoBehaviour
 
 	// Ultimo valor de la Gravedad del Objeto
 	private bool gravityWasActive;
+
+	private bool kinematicWasActive;
 	// Activa el movimiento si hay un objeto asociado y le quita la gravedad
 	public bool StartMoving()
 	{
@@ -501,9 +503,13 @@ public class Bezier : MonoBehaviour
 			Rigidbody rb = ObjectMoving.GetComponent<Rigidbody>();
 			if (rb)
 			{
-				gravityWasActive = rb.useGravity;
-				if (rb && gravityWasActive)
+				if (rb)
+				{
+					gravityWasActive = rb.useGravity;
+					kinematicWasActive = rb.isKinematic;
 					rb.useGravity = false;
+					rb.isKinematic = false;
+				}
 			}
 			moving = true;
 			return true;
@@ -518,6 +524,7 @@ public class Bezier : MonoBehaviour
 		// Volvemos a activar la gravedad si estaba activa
 		Rigidbody rb = ObjectMoving.GetComponent<Rigidbody>();
 		rb.useGravity = gravityWasActive;
+		rb.isKinematic = kinematicWasActive;
 
 		ObjectMoving = null;
 		moving = false;

@@ -27,7 +27,8 @@ public class BezierMovable : MonoBehaviour
 
 	private void OnEnable()
 	{
-		StartBezier();
+		if (InBezier)
+			StartBezier();
 	}
 
 	// Update each frame

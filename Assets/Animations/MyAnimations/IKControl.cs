@@ -9,10 +9,12 @@ public class IKControl : MonoBehaviour
 
 	protected Animator animator;
 
-	public bool ikActive = false;
+	public bool IKisActive = false;
+	public bool handsInRemote = false;
 
-	public Transform LeftHandObj = null;
-	public Transform RightHandObj = null;
+	public Transform planeHandle = null;
+	public Transform LeftHandRemote = null;
+	public Transform RightHandRemote = null;
 	public Transform lookObj = null;
 
 	void Start()
@@ -27,9 +29,8 @@ public class IKControl : MonoBehaviour
 		{
 
 			//if the IK is active, set the position and rotation directly to the goal. 
-			if (ikActive)
+			if (IKisActive)
 			{
-
 				// Set the look target position, if one has been assigned
 				if (lookObj != null)
 				{
@@ -37,23 +38,43 @@ public class IKControl : MonoBehaviour
 					animator.SetLookAtPosition(lookObj.position);
 				}
 
-				// Set the right hand target position and rotation, if one has been assigned
-				if (LeftHandObj != null)
-				{
-					animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1);
-					animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, 1);
-					animator.SetIKPosition(AvatarIKGoal.LeftHand, LeftHandObj.position);
-					animator.SetIKRotation(AvatarIKGoal.LeftHand, LeftHandObj.rotation);
-				}
-
-				if (RightHandObj != null)
+				// Mano derecha en el mando
+				if (RightHandRemote != null)
 				{
 
 					animator.SetIKPositionWeight(AvatarIKGoal.RightHand, 1);
 					animator.SetIKRotationWeight(AvatarIKGoal.RightHand, 1);
-					animator.SetIKPosition(AvatarIKGoal.RightHand, RightHandObj.position);
-					animator.SetIKRotation(AvatarIKGoal.RightHand, RightHandObj.rotation);
+					animator.SetIKPosition(AvatarIKGoal.RightHand, RightHandRemote.position);
+					animator.SetIKRotation(AvatarIKGoal.RightHand, RightHandRemote.rotation);
 				}
+
+				// Dos Estados, cuando no tiene el mando cogido lanza el avion, cuando no, coge el mando
+				if (handsInRemote)
+				{
+
+					// Mano izzquierda en el mando
+					if (LeftHandRemote != null)
+					{
+						animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1);
+						animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, 1);
+						animator.SetIKPosition(AvatarIKGoal.LeftHand, LeftHandRemote.position);
+						animator.SetIKRotation(AvatarIKGoal.LeftHand, LeftHandRemote.rotation);
+					}
+
+				}
+				else
+				{
+					// Mano agarrando el avion
+					if (LeftHandRemote != null)
+					{
+						animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1);
+						animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, 1);
+						animator.SetIKPosition(AvatarIKGoal.LeftHand, planeHandle.position);
+						animator.SetIKRotation(AvatarIKGoal.LeftHand, planeHandle.rotation);
+					}
+				}
+
+				
 
 
 
