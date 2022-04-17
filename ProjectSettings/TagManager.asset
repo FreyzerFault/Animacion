@@ -13,6 +13,7 @@ TagManager:
   - Region
   - Spawner
   - Health
+  - DeformationMesh
   layers:
   - Default
   - TransparentFX

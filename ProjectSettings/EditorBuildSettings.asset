@@ -17,4 +17,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Animation Test.unity
     guid: 465b672cf36d16f4a95bc30a2dfb449d
+  - enabled: 1
+    path: Assets/Scenes/Pick&Pull.unity
+    guid: f8fb6ef1bbc2a15438e9b638d14261ba
   m_configObjects: {}

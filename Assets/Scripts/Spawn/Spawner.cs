@@ -70,13 +70,14 @@ public class Spawner : MonoBehaviour
 
 		// Sacar de la Pool
 		GameObject item = pool.Pop();
-		item.SetActive(true);
 
 		// Si no se han asignado posicion o rotacion por defecto sera en el centro y su rotacion por defecto
 		item.transform.SetPositionAndRotation(
 			position ??= transform.position,
 			rotation ??= ObjectPrefab.transform.rotation
-			);
+		);
+
+		item.SetActive(true);
 
 		return item;
 	}

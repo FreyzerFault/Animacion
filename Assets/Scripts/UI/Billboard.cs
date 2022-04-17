@@ -5,7 +5,7 @@ using UnityEngine;
 // Un objeto Billboard va estar siempre mirando a la camara
 public class Billboard : MonoBehaviour
 {
-	public Transform cam;
+	private Transform cam;
 
 	void Start()
 	{

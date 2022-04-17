@@ -28,6 +28,10 @@ public class GiroPermanente : Spawneable
 		}
 	}
 
+	protected override void OnDisable()
+	{
+	}
+
 	// Update is called once per frame
 	void FixedUpdate()
 	{

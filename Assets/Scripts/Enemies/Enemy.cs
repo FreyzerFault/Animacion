@@ -52,8 +52,6 @@ public class Enemy : Spawneable
 
 		// Destruye las balas que tenga
 		gun.Clear();
-
-		base.OnDisable();
 	}
 
 

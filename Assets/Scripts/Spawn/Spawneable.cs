@@ -16,10 +16,7 @@ public abstract class Spawneable : MonoBehaviour
 
 	protected abstract void OnEnable();
 
-	protected virtual void OnDisable()
-	{
-		Destroy();
-	}
+	protected abstract void OnDisable();
 
 	// Cuando se destruye el objeto se devuelve a la pool
 	public virtual void Destroy()
