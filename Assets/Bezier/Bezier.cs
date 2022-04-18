@@ -19,6 +19,7 @@ public static class ExtensionMethods
 		return (value - in0) / (in1 - in0) * (out1 - out0) + out0;
 	}
 }
+
 [ExecuteAlways]
 public class Bezier : MonoBehaviour
 {

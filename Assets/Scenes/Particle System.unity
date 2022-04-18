@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: bf1bf92a3ce592e40b898be6c21cc2fa, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.24414569, g: 0.30623963, b: 0.362625, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -123,6 +123,96 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &102378348
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 102378350}
+  - component: {fileID: 102378349}
+  m_Layer: 0
+  m_Name: My Particle System
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &102378349
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 102378348}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0806d60c1dcbc0048a6ccde9e026d00b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectPrefab: {fileID: 4859874292493038385, guid: 38533a0bb9e291647947eda49620a99b, type: 3}
+  initialNumItems: 10
+  startSpd: 4.12
+  startLifetime: 10
+  startSize: 2.19
+  startColor:
+    serializedVersion: 2
+    key0: {r: 1, g: 1, b: 1, a: 1}
+    key1: {r: 0.9137255, g: 0.68235296, b: 0.09019608, a: 1}
+    key2: {r: 1, g: 0.60014594, b: 0, a: 0.16078432}
+    key3: {r: 0.9137255, g: 0.68235296, b: 0.09019608, a: 0.16078432}
+    key4: {r: 1, g: 0.8679952, b: 0, a: 0.16078432}
+    key5: {r: 0.27450982, g: 0.32156864, b: 0.6745098, a: 0.16078432}
+    key6: {r: 0.27450982, g: 0.32156864, b: 0.6745098, a: 0.16078432}
+    key7: {r: 0.27450982, g: 0.32156864, b: 0.6745098, a: 0.16078432}
+    ctime0: 0
+    ctime1: 28334
+    ctime2: 33539
+    ctime3: 37779
+    ctime4: 65535
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_NumColorKeys: 5
+    m_NumAlphaKeys: 2
+  delay: 0
+  duration: 5.11
+  looping: 1
+  rateEmission: 48
+  coneAngle: 45.7
+  coneRadius: 2.43
+  randomSpd: 1
+  randomOrientation: 1
+  randomLifeTime: 1
+  randomSize: 1
+  randomColor: 1
+  snowEffect: 1
+  useGravity: 0
+--- !u!4 &102378350
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 102378348}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 771.9096, y: 421.51416, z: -63.01}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &354862050
 GameObject:
   m_ObjectHideFlags: 0
@@ -134,7 +224,7 @@ GameObject:
   - component: {fileID: 354862052}
   - component: {fileID: 354862051}
   m_Layer: 0
-  m_Name: My Particle System
+  m_Name: Lanterns
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -154,19 +244,51 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ObjectPrefab: {fileID: 4859874292493038385, guid: 38533a0bb9e291647947eda49620a99b, type: 3}
   initialNumItems: 10
-  startSpd: 5
-  startLifetime: 2
-  startDelay: 0
-  startSize: 1
-  gravityModifier: 0
-  startColor: {r: 0.6886792, g: 0.47149464, b: 0.47149464, a: 1}
-  startOrientation: {x: 0, y: 1, z: 0}
-  duration: 5
+  startSpd: 4.12
+  startLifetime: 100
+  startSize: 2.85
+  startColor:
+    serializedVersion: 2
+    key0: {r: 1, g: 1, b: 1, a: 1}
+    key1: {r: 0.9137255, g: 0.68235296, b: 0.09019608, a: 1}
+    key2: {r: 1, g: 0.60014594, b: 0, a: 0.16078432}
+    key3: {r: 0.9137255, g: 0.68235296, b: 0.09019608, a: 0.16078432}
+    key4: {r: 1, g: 0.8679952, b: 0, a: 0.16078432}
+    key5: {r: 0.27450982, g: 0.32156864, b: 0.6745098, a: 0.16078432}
+    key6: {r: 0.27450982, g: 0.32156864, b: 0.6745098, a: 0.16078432}
+    key7: {r: 0.27450982, g: 0.32156864, b: 0.6745098, a: 0.16078432}
+    ctime0: 0
+    ctime1: 28334
+    ctime2: 33539
+    ctime3: 37779
+    ctime4: 65535
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_NumColorKeys: 5
+    m_NumAlphaKeys: 2
+  delay: 0
+  duration: 5.11
   looping: 1
-  rateEmission: 5
-  coneAngle: 1.33
-  coneRadius: 2.79
-  coneThickness: 0
+  rateEmission: 10
+  coneAngle: 45.7
+  coneRadius: 2.43
+  randomSpd: 1
+  randomOrientation: 1
+  randomLifeTime: 1
+  randomSize: 1
+  randomColor: 1
+  snowEffect: 1
+  useGravity: 0
 --- !u!4 &354862052
 Transform:
   m_ObjectHideFlags: 0
@@ -179,8 +301,98 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &786758905
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 786758907}
+  - component: {fileID: 786758906}
+  m_Layer: 0
+  m_Name: Snow
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &786758906
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 786758905}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0806d60c1dcbc0048a6ccde9e026d00b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectPrefab: {fileID: 4859874292493038385, guid: 38533a0bb9e291647947eda49620a99b, type: 3}
+  initialNumItems: 10
+  startSpd: 1.77
+  startLifetime: 100
+  startSize: 0.75
+  startColor:
+    serializedVersion: 2
+    key0: {r: 1, g: 1, b: 1, a: 0.827451}
+    key1: {r: 0.79784364, g: 1, b: 0.9831776, a: 0.050980393}
+    key2: {r: 1, g: 0.60014594, b: 0, a: 0.16078432}
+    key3: {r: 0.9137255, g: 0.68235296, b: 0.09019608, a: 0.16078432}
+    key4: {r: 1, g: 0.8679952, b: 0, a: 0.16078432}
+    key5: {r: 0.27450982, g: 0.32156864, b: 0.6745098, a: 0.16078432}
+    key6: {r: 0.27450982, g: 0.32156864, b: 0.6745098, a: 0.16078432}
+    key7: {r: 0.27450982, g: 0.32156864, b: 0.6745098, a: 0.16078432}
+    ctime0: 0
+    ctime1: 65535
+    ctime2: 33539
+    ctime3: 37779
+    ctime4: 65535
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_NumColorKeys: 2
+    m_NumAlphaKeys: 2
+  delay: 0
+  duration: 5.11
+  looping: 1
+  rateEmission: 48
+  coneAngle: 45.7
+  coneRadius: 10
+  randomSpd: 1
+  randomOrientation: 1
+  randomLifeTime: 1
+  randomSize: 1
+  randomColor: 1
+  snowEffect: 1
+  useGravity: 0
+--- !u!4 &786758907
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 786758905}
+  m_LocalRotation: {x: -1, y: 0, z: 0, w: 0}
+  m_LocalPosition: {x: 771.9096, y: 452.28, z: -63.01}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: -180, y: 0, z: 0}
 --- !u!1 &890780611
 GameObject:
   m_ObjectHideFlags: 0
@@ -350,8 +562,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1638621456}
-  m_LocalRotation: {x: 0.15185285, y: -0.68747437, z: 0.15041211, w: 0.6940431}
-  m_LocalPosition: {x: 790.0315, y: 442.34308, z: -51.672237}
+  m_LocalRotation: {x: -0.075153194, y: -0.74203193, z: -0.08441886, w: 0.66076785}
+  m_LocalPosition: {x: 801.11163, y: 429.3486, z: -57.7283}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -5159,5 +5371,5 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
