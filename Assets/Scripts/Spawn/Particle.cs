@@ -78,6 +78,6 @@ public class Particle : Spawneable
 	void OnDrawGizmos()
 	{
 		//if (GetComponent<Rigidbody>())
-			//Gizmos.DrawLine(transform.position, transform.position + GetComponent<Rigidbody>().velocity);
+		//	Gizmos.DrawLine(transform.position, transform.position + GetComponent<Rigidbody>().velocity);
 	}
 }

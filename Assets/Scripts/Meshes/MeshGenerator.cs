@@ -118,7 +118,6 @@ public class MeshData
 		MeshData newData = new MeshData(this);
 
 		// Buscamos el Vertice mas cercano a la posicion, va a ser el VERTICE RAIZ
-		float minDist = Mathf.Infinity;
 		int rootVertIndex = getNearVertex(pos);
 
 		Vector3 rootV = vertices[rootVertIndex];
