@@ -1,44 +1,51 @@
+using System;
 using UnityEngine;
 
 public class Pendulum : MonoBehaviour
 {
-	public Transform sujecion;
+	public float speed = .01f;
+	
+	public float angle;
+	public Vector3 ropeDir;
 
-	private float startAngle;
-	private float angle;
-	private Vector3 ropeDir;
+	public float angularVel = 0;
+	public float angularForce = 0.1f;
 
 	void Start()
 	{
-		startAngle = Mathf.Acos(Vector3.Dot(ropeDir.normalized, new Vector3(0, ropeDir.y, 0).normalized));
+		ropeDir = transform.position - transform.parent.position;
+		angle = Mathf.Acos(Vector3.Dot(ropeDir.normalized, new Vector3(0, ropeDir.y, 0).normalized));
 	}
 
 	void Update()
 	{
-		ropeDir = sujecion.position - transform.position;
+		ropeDir = transform.position - transform.parent.position;
+		
+		//angularForce = getSinglePendulumForce();
 
-		angle = Mathf.Acos(Vector3.Dot(ropeDir.normalized, new Vector3(0, ropeDir.y, 0).normalized));
-		if (ropeDir.x > 0)
-			angle = -angle;
+		angularVel += angularForce;
+		angle += Mathf.Deg2Rad * angularVel;
 
+		transform.localPosition = new Vector3(Mathf.Sin(angle), -Mathf.Cos(angle), 0);
+		transform.localPosition *= ropeDir.magnitude;
+	}
+
+	float getSinglePendulumForce()
+	{
 		Rigidbody rb = GetComponent<Rigidbody>();
 
-		rb.AddForce(
-			-Physics.gravity.magnitude * rb.mass * Mathf.Sin(angle) * Vector3.Cross(ropeDir.normalized, Vector3.forward)
-		);
-		
+		float m = rb.mass;
+		float g = Physics.gravity.magnitude;
+
+		return -m * g * Mathf.Sin(angle) * Time.deltaTime * speed;
 	}
 
 	void OnDrawGizmos()
 	{
 		Gizmos.color = Color.blue;
-		Gizmos.DrawLine(sujecion.position, transform.position);
+		Gizmos.DrawLine(transform.parent.position, transform.position);
 		
-
 		Gizmos.color = Color.black;
 		Gizmos.DrawLine(transform.position, transform.position + GetComponent<Rigidbody>().velocity);
-
-		Gizmos.color = Color.red;
-		Gizmos.DrawLine(transform.position, transform.position + -Physics.gravity.magnitude * GetComponent<Rigidbody>().mass * Mathf.Sin(angle) * Vector3.Cross(ropeDir.normalized, Vector3.forward));
 	}
 }
