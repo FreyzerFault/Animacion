@@ -1,8 +1,6 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using UnityStandardAssets.Water;
 
 public class MyParticleSystem : Spawner
 {
@@ -22,7 +20,7 @@ public class MyParticleSystem : Spawner
 
 	// Area de Spawn
 	[Range(0, 90)]public float coneAngle;
-	[Range(.1f, 10)]public float coneRadius = 1;
+	public float coneRadius = 1;
 
 	// Aleatoriedad
 	public bool randomSpd;
@@ -92,58 +90,46 @@ public class MyParticleSystem : Spawner
 }
 
 
-[CustomEditor(typeof(MyParticleSystem))]
-public class MyParticleSystemEditor : Editor
-{
-	public override void OnInspectorGUI()
-	{
-		MyParticleSystem ps = target as MyParticleSystem;
-		if (ps == null)
-		{
-			Debug.Log("No existe ningun objeto MyParticleSystem al que modificar su editor en el inspector");
-			return;
-		}
+//[CustomEditor(typeof(MyParticleSystem))]
+//public class MyParticleSystemEditor : Editor
+//{
+//	public void OnSceneGUI()
+//	{
+//		MyParticleSystem ps = target as MyParticleSystem;
 
-		DrawDefaultInspector();
-	}
+//		float coneHeight = 5;
 
-	public void OnSceneGUI()
-	{
-		MyParticleSystem ps = target as MyParticleSystem;
+//		Vector3 pos = ps.transform.position;
+//		Vector3 up = ps.transform.up * coneHeight;
+//		float radius = ps.coneRadius;
+//		float upRadius = ps.coneRadius + Mathf.Sin(Mathf.Deg2Rad * ps.coneAngle) * coneHeight / Mathf.Cos(Mathf.Deg2Rad * ps.coneAngle);
 
-		float coneHeight = 5;
+//		Handles.color = Color.magenta;
 
-		Vector3 pos = ps.transform.position;
-		Vector3 up = ps.transform.up * coneHeight;
-		float radius = ps.coneRadius;
-		float upRadius = ps.coneRadius + Mathf.Sin(Mathf.Deg2Rad * ps.coneAngle) * coneHeight / Mathf.Cos(Mathf.Deg2Rad * ps.coneAngle);
+//		Handles.DrawWireDisc(pos, up, ps.coneRadius, 1);
 
-		Handles.color = Color.magenta;
+//		Handles.DrawWireDisc(
+//			pos + up,
+//			up,
+//			upRadius,
+//			1);
 
-		Handles.DrawWireDisc(pos, up, ps.coneRadius, 1);
+//		Handles.DrawLine(
+//			pos + ps.transform.forward * radius,
+//			pos + up + ps.transform.forward * upRadius
+//			);
+//		Handles.DrawLine(
+//			pos - ps.transform.forward * radius,
+//			pos + up - ps.transform.forward * upRadius
+//			);
+//		Handles.DrawLine(
+//			pos + ps.transform.right * radius,
+//			pos + up + ps.transform.right * upRadius
+//			);
+//		Handles.DrawLine(
+//			pos - ps.transform.right * radius,
+//			pos + up - ps.transform.right * upRadius
+//			);
+//	}
 
-		Handles.DrawWireDisc(
-			pos + up,
-			up,
-			upRadius,
-			1);
-
-		Handles.DrawLine(
-			pos + ps.transform.forward * radius,
-			pos + up + ps.transform.forward * upRadius
-			);
-		Handles.DrawLine(
-			pos - ps.transform.forward * radius,
-			pos + up - ps.transform.forward * upRadius
-			);
-		Handles.DrawLine(
-			pos + ps.transform.right * radius,
-			pos + up + ps.transform.right * upRadius
-			);
-		Handles.DrawLine(
-			pos - ps.transform.right * radius,
-			pos + up - ps.transform.right * upRadius
-			);
-	}
-
-}
+//}

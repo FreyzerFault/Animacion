@@ -5,7 +5,7 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Shooter.unity
     guid: 8257de969388bf14f9159f8f6285b61f
   - enabled: 1
@@ -20,4 +20,13 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Pick&Pull.unity
     guid: f8fb6ef1bbc2a15438e9b638d14261ba
+  - enabled: 1
+    path: Assets/Scenes/Particle System.unity
+    guid: da6c9dab28a232a49a8abb05913d9b5c
+  - enabled: 1
+    path: Assets/Scenes/Pendulo.unity
+    guid: b56b15a8af207024d8e88dd415de2612
+  - enabled: 1
+    path: Assets/Scenes/Stereoscopia.unity
+    guid: 2a7a7f2c300a0d84787e92ee80279d0a
   m_configObjects: {}

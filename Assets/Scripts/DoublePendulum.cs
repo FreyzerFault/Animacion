@@ -22,14 +22,22 @@ public class DoublePendulum : MonoBehaviour
 	public float minAngularVelocity = -10;
 	public float maxAngularVelocity = 10;
 
+	private LineRenderer lineRenderer;
+
 	void Start()
 	{
+		if (GetComponent<LineRenderer>() != null)
+		{
+			lineRenderer = GetComponent<LineRenderer>();
+			lineRenderer.startWidth = transform.lossyScale.x * .1f;
+			lineRenderer.endWidth = transform.lossyScale.x * .1f;
+		}
+
+
 		// Cambiar el Color del trazo
 		ParticleSystem ps = p2.GetComponent<ParticleSystem>();
-		ParticleSystem.MainModule psMain = ps.main;
-		psMain.startColor = new ParticleSystem.MinMaxGradient(color);
-
 		ParticleSystem.TrailModule psTrails = ps.trails;
+		psTrails.inheritParticleColor = false;
 		psTrails.colorOverLifetime = color;
 
 		p1.ropeLength = ropeLength1;
@@ -41,6 +49,16 @@ public class DoublePendulum : MonoBehaviour
 		Vector3 pos = transform.position;
 		p1.transform.localPosition = new Vector3(Mathf.Sin(Mathf.Deg2Rad * initAngle1) * p1.ropeLength, Mathf.Cos(Mathf.Deg2Rad * initAngle1) * p1.ropeLength, 0);
 		p2.transform.localPosition = new Vector3(Mathf.Sin(Mathf.Deg2Rad * initAngle2) * p2.ropeLength, Mathf.Cos(Mathf.Deg2Rad * initAngle2) * p2.ropeLength, 0);
+	}
+
+	void Update()
+	{
+		if (lineRenderer != null)
+		{
+			lineRenderer.SetPosition(0, transform.position);
+			lineRenderer.SetPosition(1, p1.transform.position); 
+			lineRenderer.SetPosition(2, p2.transform.position); 
+		}
 	}
 	
 	void FixedUpdate()

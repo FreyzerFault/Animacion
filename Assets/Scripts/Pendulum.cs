@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Pendulum : MonoBehaviour
 {
-	public float speed = .01f;
+	public float AnimationSpeed = .01f;
 	
 	public float angle = 60;
 	public float ropeLength = 1;
@@ -20,7 +20,7 @@ public class Pendulum : MonoBehaviour
 
 	void FixedUpdate()
 	{
-		
+
 		//angularForce = getSinglePendulumForce();
 
 		//angularVel += angularForce;
@@ -38,7 +38,7 @@ public class Pendulum : MonoBehaviour
 		float m = rb.mass;
 		float g = Physics.gravity.magnitude;
 
-		return -m * g * Mathf.Sin(Mathf.Deg2Rad * angle) * Time.fixedDeltaTime * speed;
+		return -m * g * Mathf.Sin(Mathf.Deg2Rad * angle) * Time.fixedDeltaTime * AnimationSpeed;
 	}
 
 	void OnDrawGizmos()
