@@ -227,7 +227,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8667951801174304073, guid: 219a8ee689988c7438a0fd2211c7e26a, type: 3}
       propertyPath: startLifetime
-      value: 100
+      value: 30.3
       objectReference: {fileID: 0}
     - target: {fileID: 8667951801174304073, guid: 219a8ee689988c7438a0fd2211c7e26a, type: 3}
       propertyPath: startColor.ctime1
@@ -4791,11 +4791,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8667951801174304073, guid: 219a8ee689988c7438a0fd2211c7e26a, type: 3}
       propertyPath: rateEmission
-      value: 368
+      value: 21
       objectReference: {fileID: 0}
     - target: {fileID: 8667951801174304073, guid: 219a8ee689988c7438a0fd2211c7e26a, type: 3}
       propertyPath: startLifetime
-      value: 100
+      value: 62.3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 219a8ee689988c7438a0fd2211c7e26a, type: 3}
