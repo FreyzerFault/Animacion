@@ -10,6 +10,10 @@ public class SceneController : SingletonPersistent<SceneController>
 		{1, GameMode.Default },
 		{2, GameMode.Default },
 		{3, GameMode.Default },
+		{4, GameMode.Default },
+		{5, GameMode.Default },
+		{6, GameMode.Default },
+		{7, GameMode.Default },
 	};
 
 	protected override void Awake()
