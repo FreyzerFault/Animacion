@@ -1862,7 +1862,7 @@ MonoBehaviour:
   introcularDistSlider: {fileID: 245836872}
   focalDistSlider: {fileID: 129171679}
   FOVSlider: {fileID: 40512569}
-  introcularDist: 0.5
+  introcularDist: 0.3
   focalDist: 0.5
   FOV: 0.5
 --- !u!114 &984583162
