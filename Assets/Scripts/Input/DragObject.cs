@@ -7,7 +7,7 @@ public class DragObject : MonoBehaviour
 	protected Vector3 offset;
 	private float zCoord;
 
-	void OnMouseDown()
+	protected void OnMouseDown()
 	{
 		// Z relativa a la camara
 		zCoord = Camera.main.WorldToScreenPoint(transform.position).z;
@@ -15,6 +15,14 @@ public class DragObject : MonoBehaviour
 		// Offset desde el mouse hasta la posicion del objeto
 		offset = transform.position - GetMouseWorldPos();
 	}
+
+	protected void OnMouseDrag()
+	{
+		// Mover el objeto hacia el cursor
+		transform.position = GetMouseWorldPos() + offset;
+		
+	}
+	
 
 	protected Vector3 GetMouseWorldPos()
 	{
@@ -26,11 +34,5 @@ public class DragObject : MonoBehaviour
 
 		// Devolvemos las Coords de la Pantalla a Coords Globales
 		return Camera.main.ScreenToWorldPoint(mousePoint);
-	}
-
-	void OnMouseDrag()
-	{
-		// Mover el objeto hacia el cursor
-		transform.position = GetMouseWorldPos() + offset;
 	}
 }

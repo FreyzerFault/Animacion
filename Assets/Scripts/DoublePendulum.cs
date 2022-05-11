@@ -24,6 +24,8 @@ public class DoublePendulum : MonoBehaviour
 
 	private LineRenderer lineRenderer;
 
+	public bool active = false;
+
 	void Start()
 	{
 		if (GetComponent<LineRenderer>() != null)
@@ -40,15 +42,8 @@ public class DoublePendulum : MonoBehaviour
 		psTrails.inheritParticleColor = false;
 		psTrails.colorOverLifetime = color;
 
-		p1.ropeLength = ropeLength1;
-		p2.ropeLength = ropeLength2;
-
-		p1.angle = initAngle1;
-		p2.angle = initAngle2;
-
-		Vector3 pos = transform.position;
-		p1.transform.localPosition = new Vector3(Mathf.Sin(Mathf.Deg2Rad * initAngle1) * p1.ropeLength, Mathf.Cos(Mathf.Deg2Rad * initAngle1) * p1.ropeLength, 0);
-		p2.transform.localPosition = new Vector3(Mathf.Sin(Mathf.Deg2Rad * initAngle2) * p2.ropeLength, Mathf.Cos(Mathf.Deg2Rad * initAngle2) * p2.ropeLength, 0);
+		init();
+		updatePendulumPosition();
 	}
 
 	void Update()
@@ -56,12 +51,30 @@ public class DoublePendulum : MonoBehaviour
 		if (lineRenderer != null)
 		{
 			lineRenderer.SetPosition(0, transform.position);
-			lineRenderer.SetPosition(1, p1.transform.position); 
-			lineRenderer.SetPosition(2, p2.transform.position); 
+			lineRenderer.SetPosition(1, p1.transform.position);
+			lineRenderer.SetPosition(2, p2.transform.position);
+		}
+
+		// Con espacio toggle entre activo e inactivo
+		if (Input.GetKeyDown(KeyCode.Space))
+		{
+			active = !active;
+			reset();
 		}
 	}
 	
 	void FixedUpdate()
+	{
+		if (!active)
+		{
+			return;
+		}
+
+		move();
+		updatePendulumPosition();
+	}
+
+	void move()
 	{
 		float g = Physics.gravity.magnitude * Time.fixedDeltaTime * Time.fixedDeltaTime;
 		float m1 = p1.GetComponent<Rigidbody>().mass;
@@ -76,14 +89,14 @@ public class DoublePendulum : MonoBehaviour
 		float v2 = p2.angularVel;
 
 		p1.angularForce = -g * (2 * m1 + m2) * Mathf.Sin(a1)
-						  - m2 * g * Mathf.Sin(a1 - 2 * a2)
-						  - 2 * Mathf.Sin(a1 - a2)
-						  * m2 * (v2 * v2 * l2 + v1 * v1 * l1 * Mathf.Cos(a1 - a2))
-						  / (l1 * (2 * m1 + m2 - m2 * Mathf.Cos(2 * a1 - 2 * a2)));
+		                  - m2 * g * Mathf.Sin(a1 - 2 * a2)
+		                  - 2 * Mathf.Sin(a1 - a2)
+		                      * m2 * (v2 * v2 * l2 + v1 * v1 * l1 * Mathf.Cos(a1 - a2))
+		                  / (l1 * (2 * m1 + m2 - m2 * Mathf.Cos(2 * a1 - 2 * a2)));
 		p2.angularForce = 2 * Mathf.Sin(a1 - a2)
-							* (v1 * v1 * l1 * (m1 + m2) + g * (m1 + m2) * Mathf.Cos(a1)
-							+ v2 * v2 * l2 * m2 * Mathf.Cos(a1 - a2))
-							/ (l2 * (2 * m1 + m2 - m2 * Mathf.Cos(2 * a1 - 2 * a2)));
+		                    * (v1 * v1 * l1 * (m1 + m2) + g * (m1 + m2) * Mathf.Cos(a1)
+		                                                + v2 * v2 * l2 * m2 * Mathf.Cos(a1 - a2))
+		                  / (l2 * (2 * m1 + m2 - m2 * Mathf.Cos(2 * a1 - 2 * a2)));
 
 		p1.angularForce *= Time.fixedDeltaTime * animationSpeed;
 		p2.angularForce *= Time.fixedDeltaTime * animationSpeed;
@@ -101,5 +114,70 @@ public class DoublePendulum : MonoBehaviour
 
 		p1.angle += p1.angularVel;
 		p2.angle += p2.angularVel;
+	}
+
+	public void updatePendulumPosition()
+	{
+		p1.transform.position = transform.position 
+		                        + Quaternion.Euler(0, 0, p1.angle) 
+		                        * Vector3.down 
+		                        * p1.ropeLength;
+
+		p2.transform.position = p1.transform.position 
+		                        + Quaternion.Euler(0, 0, p2.angle) 
+		                        * (p1.transform.position - transform.position).normalized
+		                        * p2.ropeLength;
+		
+	}
+
+	void reset()
+	{
+		Vector3 rope1 = p1.transform.localPosition;
+		Vector3 rope2 = p2.transform.localPosition;
+		p1.ropeLength = rope1.magnitude;
+		p2.ropeLength = rope2.magnitude;
+
+		// ArcoCoseno de la proyeccion de la cuerda sobre su eje cuyo angulo = 0
+		p1.angle = Mathf.Rad2Deg * Mathf.Acos(Vector3.Dot(rope1.normalized, Vector3.down));
+		p2.angle = Mathf.Rad2Deg * Mathf.Acos(Vector3.Dot(rope2.normalized, rope1.normalized));
+
+		if (Vector3.Dot(rope1.normalized, Vector3.right) < 0)
+			p1.angle = -p1.angle;
+		if (Vector3.Dot(rope2.normalized, Vector3.Cross(rope1.normalized, Vector3.forward)) > 0)
+			p2.angle = -p2.angle;
+
+		p1.angularVel = 0;
+		p2.angularVel = 0;
+	}
+
+	void init()
+	{
+		p1.ropeLength = ropeLength1;
+		p2.ropeLength = ropeLength2;
+
+		p1.angle = initAngle1;
+		p2.angle = initAngle2;
+	}
+
+	void OnDrawGizmos()
+	{
+		Vector3 rope1 = p1.transform.localPosition;
+		Vector3 rope2 = p2.transform.localPosition;
+
+		Gizmos.color = Color.blue;
+		Gizmos.DrawLine(transform.position, transform.position + rope1);
+		Gizmos.DrawLine(p1.transform.position, p1.transform.position + rope2);
+
+		// ArcoCoseno de la proyeccion de la cuerda sobre su eje cuyo angulo = 0
+		float angle1 = Mathf.Rad2Deg * Mathf.Acos(Vector3.Dot(rope1.normalized, Vector3.down));
+		float angle2 = Mathf.Rad2Deg * Mathf.Acos(Vector3.Dot(rope2.normalized, rope1.normalized));
+		
+		Gizmos.color = Color.red;
+		Gizmos.DrawLine(transform.position, transform.position + Vector3.down * Vector3.Dot(rope1.normalized, Vector3.down));
+		Gizmos.DrawLine(p1.transform.position, p1.transform.position + rope1.normalized * Vector3.Dot(rope2.normalized, rope1.normalized));
+		
+		Gizmos.color = Color.yellow;
+		Gizmos.DrawLine(p1.transform.position, p1.transform.position + Vector3.Cross(rope1.normalized, Vector3.forward) * Vector3.Dot(rope2.normalized, Vector3.Cross(rope1.normalized, Vector3.forward)));
+		
 	}
 }

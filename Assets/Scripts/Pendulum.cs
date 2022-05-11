@@ -10,24 +10,28 @@ public class Pendulum : MonoBehaviour
 
 	public float angularVel = 0;
 	public float angularForce = 1f;
+	
 
-	void Awake()
+	public void resetMovement()
 	{
 		Vector3 ropeDir = transform.position - transform.parent.position;
 		ropeLength = ropeDir.magnitude;
 		angle = Mathf.Acos(Vector3.Dot(ropeDir.normalized, new Vector3(0, ropeDir.y, 0).normalized));
+		angularVel = 0;
+		angularForce = 1f;
 	}
 
-	void FixedUpdate()
+	public void updateAngle(float force)
 	{
+		angularForce = force;
+		angularVel += angularForce;
+		angle += angularVel;
+	}
 
-		//angularForce = getSinglePendulumForce();
-
-		//angularVel += angularForce;
-		//angle += angularVel;
-
-
-		transform.localPosition = new Vector3(Mathf.Sin(Mathf.Deg2Rad * angle), -Mathf.Cos(Mathf.Deg2Rad * angle), 0);
+	public void updatePosition()
+	{
+		transform.localPosition =
+			new Vector3(Mathf.Sin(Mathf.Deg2Rad * angle), -Mathf.Cos(Mathf.Deg2Rad * angle), 0);
 		transform.localPosition *= ropeLength;
 	}
 
@@ -39,14 +43,5 @@ public class Pendulum : MonoBehaviour
 		float g = Physics.gravity.magnitude;
 
 		return -m * g * Mathf.Sin(Mathf.Deg2Rad * angle) * Time.fixedDeltaTime * AnimationSpeed;
-	}
-
-	void OnDrawGizmos()
-	{
-		Gizmos.color = Color.blue;
-		Gizmos.DrawLine(transform.parent.position, transform.position);
-		
-		Gizmos.color = Color.black;
-		Gizmos.DrawLine(transform.position, transform.position + GetComponent<Rigidbody>().velocity);
 	}
 }
