@@ -1,8 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class DoublePendulum : MonoBehaviour
 {
@@ -22,45 +18,49 @@ public class DoublePendulum : MonoBehaviour
 	public float minAngularVelocity = -10;
 	public float maxAngularVelocity = 10;
 
-	private LineRenderer lineRenderer;
+	private LineRenderer _lineRenderer;
 
 	public bool active = false;
+	private Rigidbody _p1Rb;
+	private Rigidbody _p2Rb;
 
-	void Start()
+	private void Start()
 	{
+		_p2Rb = p2.GetComponent<Rigidbody>();
+		_p1Rb = p1.GetComponent<Rigidbody>();
 		if (GetComponent<LineRenderer>() != null)
 		{
-			lineRenderer = GetComponent<LineRenderer>();
-			lineRenderer.startWidth = transform.lossyScale.x * .1f;
-			lineRenderer.endWidth = transform.lossyScale.x * .1f;
+			_lineRenderer = GetComponent<LineRenderer>();
+			var lossyScale = transform.lossyScale;
+			_lineRenderer.startWidth = lossyScale.x * .1f;
+			_lineRenderer.endWidth = lossyScale.x * .1f;
 		}
 
 
 		// Cambiar el Color del trazo
-		ParticleSystem ps = p2.GetComponent<ParticleSystem>();
-		ParticleSystem.TrailModule psTrails = ps.trails;
+		var ps = p2.GetComponent<ParticleSystem>();
+		var psTrails = ps.trails;
 		psTrails.inheritParticleColor = false;
 		psTrails.colorOverLifetime = color;
 
-		init();
-		updatePendulumPosition();
+		Init();
+		UpdatePendulumPosition();
 	}
 
 	void Update()
 	{
-		if (lineRenderer != null)
+		if (_lineRenderer)
 		{
-			lineRenderer.SetPosition(0, transform.position);
-			lineRenderer.SetPosition(1, p1.transform.position);
-			lineRenderer.SetPosition(2, p2.transform.position);
+			_lineRenderer.SetPosition(0, transform.position);
+			_lineRenderer.SetPosition(1, p1.transform.position);
+			_lineRenderer.SetPosition(2, p2.transform.position);
 		}
 
 		// Con espacio toggle entre activo e inactivo
-		if (Input.GetKeyDown(KeyCode.Space))
-		{
-			active = !active;
-			reset();
-		}
+		if (!Input.GetKeyDown(KeyCode.Space)) return;
+		
+		active = !active;
+		Reset();
 	}
 	
 	void FixedUpdate()
@@ -70,23 +70,23 @@ public class DoublePendulum : MonoBehaviour
 			return;
 		}
 
-		move();
-		updatePendulumPosition();
+		Move();
+		UpdatePendulumPosition();
 	}
 
-	void move()
+	private void Move()
 	{
-		float g = Physics.gravity.magnitude * Time.fixedDeltaTime * Time.fixedDeltaTime;
-		float m1 = p1.GetComponent<Rigidbody>().mass;
-		float m2 = p2.GetComponent<Rigidbody>().mass;
+		var g = Physics.gravity.magnitude * Time.fixedDeltaTime * Time.fixedDeltaTime;
+		var m1 = _p1Rb.mass;
+		var m2 = _p2Rb.mass;
 
-		float l1 = p1.ropeLength;
-		float l2 = p2.ropeLength;
+		var l1 = p1.ropeLength;
+		var l2 = p2.ropeLength;
 
-		float a1 = Mathf.Deg2Rad * p1.angle;
-		float a2 = Mathf.Deg2Rad * p2.angle;
-		float v1 = p1.angularVel;
-		float v2 = p2.angularVel;
+		var a1 = Mathf.Deg2Rad * p1.angle;
+		var a2 = Mathf.Deg2Rad * p2.angle;
+		var v1 = p1.angularVel;
+		var v2 = p2.angularVel;
 
 		p1.angularForce = -g * (2 * m1 + m2) * Mathf.Sin(a1)
 		                  - m2 * g * Mathf.Sin(a1 - 2 * a2)
@@ -116,24 +116,26 @@ public class DoublePendulum : MonoBehaviour
 		p2.angle += p2.angularVel;
 	}
 
-	public void updatePendulumPosition()
+	public void UpdatePendulumPosition()
 	{
-		p1.transform.position = transform.position 
-		                        + Quaternion.Euler(0, 0, p1.angle) 
-		                        * Vector3.down 
-		                        * p1.ropeLength;
-
-		p2.transform.position = p1.transform.position 
-		                        + Quaternion.Euler(0, 0, p2.angle) 
-		                        * (p1.transform.position - transform.position).normalized
-		                        * p2.ropeLength;
+		var thisPos = transform.position;
+		var p1Pos = thisPos 
+		            + Quaternion.Euler(0, 0, p1.angle) 
+		            * Vector3.down 
+		            * p1.ropeLength;
 		
+		p1.transform.position = p1Pos; 
+		
+		p2.transform.position = p1Pos 
+		                        + Quaternion.Euler(0, 0, p2.angle) 
+		                        * (p1Pos - thisPos).normalized
+		                        * p2.ropeLength;
 	}
 
-	void reset()
+	private void Reset()
 	{
-		Vector3 rope1 = p1.transform.localPosition;
-		Vector3 rope2 = p2.transform.localPosition;
+		var rope1 = p1.transform.localPosition;
+		var rope2 = p2.transform.localPosition;
 		p1.ropeLength = rope1.magnitude;
 		p2.ropeLength = rope2.magnitude;
 
@@ -150,7 +152,7 @@ public class DoublePendulum : MonoBehaviour
 		p2.angularVel = 0;
 	}
 
-	void init()
+	private void Init()
 	{
 		p1.ropeLength = ropeLength1;
 		p2.ropeLength = ropeLength2;
@@ -161,23 +163,25 @@ public class DoublePendulum : MonoBehaviour
 
 	void OnDrawGizmos()
 	{
-		Vector3 rope1 = p1.transform.localPosition;
-		Vector3 rope2 = p2.transform.localPosition;
+		var rope1 = p1.transform.localPosition;
+		var rope2 = p2.transform.localPosition;
 
 		Gizmos.color = Color.blue;
-		Gizmos.DrawLine(transform.position, transform.position + rope1);
-		Gizmos.DrawLine(p1.transform.position, p1.transform.position + rope2);
+		var position = transform.position;
+		var p1Pos = p1.transform.position;
+		Gizmos.DrawLine(position, position + rope1);
+		Gizmos.DrawLine(p1Pos, p1Pos + rope2);
 
 		// ArcoCoseno de la proyeccion de la cuerda sobre su eje cuyo angulo = 0
-		float angle1 = Mathf.Rad2Deg * Mathf.Acos(Vector3.Dot(rope1.normalized, Vector3.down));
-		float angle2 = Mathf.Rad2Deg * Mathf.Acos(Vector3.Dot(rope2.normalized, rope1.normalized));
+		var angle1 = Mathf.Rad2Deg * Mathf.Acos(Vector3.Dot(rope1.normalized, Vector3.down));
+		var angle2 = Mathf.Rad2Deg * Mathf.Acos(Vector3.Dot(rope2.normalized, rope1.normalized));
 		
 		Gizmos.color = Color.red;
-		Gizmos.DrawLine(transform.position, transform.position + Vector3.down * Vector3.Dot(rope1.normalized, Vector3.down));
-		Gizmos.DrawLine(p1.transform.position, p1.transform.position + rope1.normalized * Vector3.Dot(rope2.normalized, rope1.normalized));
+		Gizmos.DrawLine(position, position + Vector3.down * Vector3.Dot(rope1.normalized, Vector3.down));
+		Gizmos.DrawLine(p1Pos, p1Pos + rope1.normalized * Vector3.Dot(rope2.normalized, rope1.normalized));
 		
 		Gizmos.color = Color.yellow;
-		Gizmos.DrawLine(p1.transform.position, p1.transform.position + Vector3.Cross(rope1.normalized, Vector3.forward) * Vector3.Dot(rope2.normalized, Vector3.Cross(rope1.normalized, Vector3.forward)));
+		Gizmos.DrawLine(p1Pos, p1Pos + Vector3.Cross(rope1.normalized, Vector3.forward) * Vector3.Dot(rope2.normalized, Vector3.Cross(rope1.normalized, Vector3.forward)));
 		
 	}
 }

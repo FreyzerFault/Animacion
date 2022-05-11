@@ -58,7 +58,7 @@ public class DragPendulum : DragObject
 		p2.angle = Mathf.Rad2Deg * theta2;
 
 		// Actualiza la posicion de los pendulos segun los angulos calculados
-		doublePendulum.updatePendulumPosition();
+		doublePendulum.UpdatePendulumPosition();
 	}
 
 	void OnDrawGizmos()
