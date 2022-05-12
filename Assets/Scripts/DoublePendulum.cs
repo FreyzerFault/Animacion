@@ -1,4 +1,4 @@
-using UnityEngine;
+ using UnityEngine;
 
 public class DoublePendulum : MonoBehaviour
 {
@@ -20,17 +20,20 @@ public class DoublePendulum : MonoBehaviour
 
 	private LineRenderer _lineRenderer;
 
-	public bool active = false;
+	public bool active = true;
 	private Rigidbody _p1Rb;
 	private Rigidbody _p2Rb;
+
+	public bool stopControlActivated;
 
 	private void Start()
 	{
 		_p2Rb = p2.GetComponent<Rigidbody>();
 		_p1Rb = p1.GetComponent<Rigidbody>();
-		if (GetComponent<LineRenderer>() != null)
+		_lineRenderer = GetComponent<LineRenderer>(); 
+		if (_lineRenderer)
 		{
-			_lineRenderer = GetComponent<LineRenderer>();
+			_lineRenderer.positionCount = 3;
 			var lossyScale = transform.lossyScale;
 			_lineRenderer.startWidth = lossyScale.x * .1f;
 			_lineRenderer.endWidth = lossyScale.x * .1f;
@@ -47,7 +50,7 @@ public class DoublePendulum : MonoBehaviour
 		UpdatePendulumPosition();
 	}
 
-	void Update()
+	private void Update()
 	{
 		if (_lineRenderer)
 		{
@@ -57,18 +60,17 @@ public class DoublePendulum : MonoBehaviour
 		}
 
 		// Con espacio toggle entre activo e inactivo
+		if (!stopControlActivated) return;
 		if (!Input.GetKeyDown(KeyCode.Space)) return;
 		
 		active = !active;
 		Reset();
 	}
-	
-	void FixedUpdate()
+
+	private void FixedUpdate()
 	{
 		if (!active)
-		{
 			return;
-		}
 
 		Move();
 		UpdatePendulumPosition();
@@ -161,7 +163,7 @@ public class DoublePendulum : MonoBehaviour
 		p2.angle = initAngle2;
 	}
 
-	void OnDrawGizmos()
+	private void OnDrawGizmos()
 	{
 		var rope1 = p1.transform.localPosition;
 		var rope2 = p2.transform.localPosition;
@@ -169,13 +171,7 @@ public class DoublePendulum : MonoBehaviour
 		Gizmos.color = Color.blue;
 		var position = transform.position;
 		var p1Pos = p1.transform.position;
-		Gizmos.DrawLine(position, position + rope1);
-		Gizmos.DrawLine(p1Pos, p1Pos + rope2);
 
-		// ArcoCoseno de la proyeccion de la cuerda sobre su eje cuyo angulo = 0
-		var angle1 = Mathf.Rad2Deg * Mathf.Acos(Vector3.Dot(rope1.normalized, Vector3.down));
-		var angle2 = Mathf.Rad2Deg * Mathf.Acos(Vector3.Dot(rope2.normalized, rope1.normalized));
-		
 		Gizmos.color = Color.red;
 		Gizmos.DrawLine(position, position + Vector3.down * Vector3.Dot(rope1.normalized, Vector3.down));
 		Gizmos.DrawLine(p1Pos, p1Pos + rope1.normalized * Vector3.Dot(rope2.normalized, rope1.normalized));

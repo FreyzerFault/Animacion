@@ -246,7 +246,7 @@ public class Bezier : MonoBehaviour
 		return (float)t * GetLenght();
 	}
 
-	// Devuelve el Par·metro t para un espacio recorrido en la curva
+	// Devuelve el Par√°metro t para un espacio recorrido en la curva
 	public decimal GetT(float distance)
 	{
 		// Casos Triviales:

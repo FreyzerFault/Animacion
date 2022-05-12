@@ -29,4 +29,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Stereoscopia.unity
     guid: 2a7a7f2c300a0d84787e92ee80279d0a
+  - enabled: 1
+    path: Assets/Scenes/IK Unity.unity
+    guid: 34e788f0a4bd93d4d8f734814410b9d4
+  - enabled: 1
+    path: Assets/Scenes/IK Pendulum.unity
+    guid: 6d37636b760cddd4bbbe48ab27faf406
   m_configObjects: {}
