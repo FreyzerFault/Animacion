@@ -1,6 +1,8 @@
+using System;
 using UnityEngine;
 using UnityStandardAssets.Cameras;
 
+[Serializable]
 public enum GameMode
 {
 	Default,
@@ -22,10 +24,10 @@ public class GameManager : Singleton<GameManager>
 
 	private GameObject _player;
 	private Camera _mainCamera;
-	private GameMode _mode;
+	public GameMode _mode;
 
-	private float _TimeScaleRef = 1;
-	private float _VolumeRef = 1;
+	public float _TimeScaleRef = 1;
+	public float _VolumeRef = 1;
 
 	public static GameObject Player
 	{

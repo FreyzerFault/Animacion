@@ -3,13 +3,22 @@ using UnityEngine;
 // Permite volver a crear el objeto de 0 pero funciona como un Singleton
 public abstract class StaticInstance<T> : MonoBehaviour where T : MonoBehaviour
 {
-	public static T Instance { get; private set; }
+	public static T Instance { get; protected set; }
 
 	//protected StaticInstance()
 	//{
 	//	Instance = this as T;
 	//}
-	protected virtual void Awake() => Instance = this as T;
+	protected virtual void Awake()
+	{
+		if (Instance != null)
+			if (Application.isPlaying)
+				Destroy(Instance);
+			else
+				DestroyImmediate(Instance);
+		
+		Instance = this as T;
+	}
 
 	protected virtual void OnApplicationQuit()
 	{
@@ -28,8 +37,8 @@ public abstract class Singleton<T> : StaticInstance<T> where T : MonoBehaviour
 				Destroy(gameObject);
 			else
 				DestroyImmediate(gameObject);
-
-		base.Awake();
+		else
+			Instance = this as T;
 	}
 }
 

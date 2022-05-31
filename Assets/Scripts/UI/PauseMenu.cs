@@ -6,12 +6,12 @@ using UnityEngine.UI;
 
 public class PauseMenu : SingletonPersistent<PauseMenu>
 {
-	private Toggle m_MenuToggle;
-	private bool m_Paused;
+	public Toggle m_MenuToggle;
+	public bool m_Paused;
 
 	public GameObject buttonPanel;
 
-	private GameMode lastGameMode;
+	public GameMode lastGameMode;
 
 	protected override void Awake()
 	{
@@ -58,6 +58,7 @@ public class PauseMenu : SingletonPersistent<PauseMenu>
 
 	public static void SwitchScene(int i)
 	{
+		Debug.Log("Scene changed to " + i);
 		Instance.m_MenuToggle.isOn = false;
 		SceneController.SwitchScene(i);
 	}

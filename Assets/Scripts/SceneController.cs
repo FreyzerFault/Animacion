@@ -14,6 +14,9 @@ public class SceneController : SingletonPersistent<SceneController>
 		{5, GameMode.Default },
 		{6, GameMode.Default },
 		{7, GameMode.Default },
+		{8, GameMode.Default },
+		{9, GameMode.Default },
+		{10, GameMode.Default },
 	};
 
 	protected override void Awake()
